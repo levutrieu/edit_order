@@ -1,75 +1,431 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
    <head>
       <meta charset="UTF-8" />
+
       <meta
          name="viewport"
-         content="width=device-width,initial-scale=1,maximum-scale=1"
+         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
 
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
       <title>Order Editor</title>
+
+      <style>
+         * {
+            box-sizing: border-box;
+         }
+
+         body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+         }
+
+         .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+         }
+
+         h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+         }
+
+         label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+         }
+
+         select,
+         input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+         }
+
+         button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            border: 0;
+            border-radius: 8px;
+            background: #0088cc;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+         }
+
+         button:active {
+            opacity: 0.8;
+         }
+
+         #error {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fee4e2;
+            color: #b42318;
+            font-size: 14px;
+         }
+      </style>
    </head>
 
    <body>
-      <h3>✏️ Chỉnh sửa đơn hàng</h3>
+      <div class="container">
+         <h3>✏️ Chỉnh sửa đơn hàng</h3>
 
-      <label>Người đóng</label>
-      <select id="dong"></select>
+         <label for="dong">Người đóng</label>
+         <select id="dong">
+            <option value="">-- Chọn người đóng --</option>
+         </select>
 
-      <label>Người soạn</label>
-      <select id="soan"></select>
+         <label for="soan">Người soạn</label>
+         <select id="soan">
+            <option value="">-- Chọn người soạn --</option>
+         </select>
 
-      <label>Người giao</label>
-      <select id="giao"></select>
+         <label for="giao">Người giao</label>
+         <select id="giao">
+            <option value="">-- Chọn người giao --</option>
+         </select>
 
-      <label>Số kiện</label>
-      <input id="so_kien" type="number" min="0" />
+         <label for="so_kien">Số kiện</label>
+         <input
+            id="so_kien"
+            type="number"
+            min="0"
+            step="1"
+            value="0"
+         />
 
-      <button onclick="submitForm()">SUBMIT</button>
+         <button type="button" onclick="submitForm()">
+            SUBMIT
+         </button>
+
+         <div id="error"></div>
+      </div>
 
       <script>
          const tg = window.Telegram.WebApp;
 
-         tg.ready();
-         tg.expand();
-
-         console.log(tg.initData);
-         console.log(tg.initDataUnsafe);
+         // =========================
+         // Telegram init
+         // =========================
 
          tg.ready();
          tg.expand();
 
-         const startapp = tg.initDataUnsafe.start_param;
+         console.log("Telegram initData:", tg.initData);
+         console.log("Telegram initDataUnsafe:", tg.initDataUnsafe);
+
+
+         // =========================
+         // Hiển thị lỗi
+         // =========================
+
+         function showError(message) {
+            const error = document.getElementById("error");
+
+            error.innerText = message;
+            error.style.display = "block";
+
+            console.error(message);
+         }
+
+
+         // =========================
+         // Base64URL decode
+         // =========================
 
          function decodeBase64Url(str) {
-            str = str.replace(/-/g, "+").replace(/_/g, "/");
+            if (!str) {
+               throw new Error(
+                  "Không có Telegram start_param."
+               );
+            }
 
-            while (str.length % 4) {
+            str = String(str)
+               .replace(/-/g, "+")
+               .replace(/_/g, "/");
+
+            while (str.length % 4 !== 0) {
                str += "=";
             }
 
-            const bytes = Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+            const binary = atob(str);
 
-            return new TextDecoder().decode(bytes);
+            const bytes = Uint8Array.from(
+               binary,
+               (c) => c.charCodeAt(0)
+            );
+
+            return new TextDecoder("utf-8").decode(bytes);
          }
 
-         const payload = JSON.parse(decodeBase64Url(startapp));
 
-         console.log(payload);
+         // =========================
+         // Lấy payload từ start_param
+         // =========================
+
+         function getPayload() {
+            const startParam =
+               tg.initDataUnsafe?.start_param;
+
+            console.log(
+               "start_param:",
+               startParam
+            );
+
+            if (!startParam) {
+               throw new Error(
+                  "Không tìm thấy start_param. " +
+                  "Mini App phải được mở từ Telegram với start_param."
+               );
+            }
+
+            let decoded;
+
+            try {
+               decoded = decodeBase64Url(startParam);
+            } catch (e) {
+               throw new Error(
+                  "Không thể decode start_param: " +
+                  e.message
+               );
+            }
+
+            console.log(
+               "Decoded start_param:",
+               decoded
+            );
+
+            try {
+               return JSON.parse(decoded);
+            } catch (e) {
+               throw new Error(
+                  "start_param không phải JSON hợp lệ: " +
+                  decoded
+               );
+            }
+         }
+
+
+         // =========================
+         // Tạo option cho select
+         // =========================
+
+         function fillSelect(
+            elementId,
+            employees,
+            placeholder
+         ) {
+            const select =
+               document.getElementById(elementId);
+
+            select.innerHTML = "";
+
+            const firstOption =
+               document.createElement("option");
+
+            firstOption.value = "";
+            firstOption.textContent = placeholder;
+
+            select.appendChild(firstOption);
+
+            if (!Array.isArray(employees)) {
+               return;
+            }
+
+            employees.forEach((item) => {
+               const option =
+                  document.createElement("option");
+
+               option.value =
+                  item.id ?? item.ID ?? "";
+
+               option.textContent =
+                  item.name ??
+                  item.Name ??
+                  item.title ??
+                  item.Title ??
+                  option.value;
+
+               select.appendChild(option);
+            });
+         }
+
+
+         // =========================
+         // Load dữ liệu
+         // =========================
+
+         function loadForm() {
+            try {
+               const payload = getPayload();
+
+               console.log(
+                  "PAYLOAD:",
+                  payload
+               );
+
+               /*
+                Ví dụ payload:
+
+                {
+                   "order_id": "DH001",
+
+                   "dong": [
+                      {
+                         "id": "NV01",
+                         "name": "Nguyễn Văn A"
+                      }
+                   ],
+
+                   "soan": [
+                      {
+                         "id": "NV02",
+                         "name": "Nguyễn Văn B"
+                      }
+                   ],
+
+                   "giao": [
+                      {
+                         "id": "NV03",
+                         "name": "Nguyễn Văn C"
+                      }
+                   ],
+
+                   "so_kien": 5
+                }
+               */
+
+               fillSelect(
+                  "dong",
+                  payload.dong,
+                  "-- Chọn người đóng --"
+               );
+
+               fillSelect(
+                  "soan",
+                  payload.soan,
+                  "-- Chọn người soạn --"
+               );
+
+               fillSelect(
+                  "giao",
+                  payload.giao,
+                  "-- Chọn người giao --"
+               );
+
+               // Số kiện
+               if (
+                  payload.so_kien !== undefined &&
+                  payload.so_kien !== null
+               ) {
+                  document.getElementById(
+                     "so_kien"
+                  ).value = payload.so_kien;
+               }
+
+            } catch (error) {
+               showError(error.message);
+            }
+         }
+
+
+         // =========================
+         // Submit
+         // =========================
 
          function submitForm() {
-            const data = {
-               dong_id: document.getElementById("dong").value,
-               soan_id: document.getElementById("soan").value,
-               giao_id: document.getElementById("giao").value,
-               so_kien: Number(document.getElementById("so_kien").value),
-            };
+            try {
+               const dong =
+                  document.getElementById(
+                     "dong"
+                  ).value;
 
-            // Gửi dữ liệu về Telegram Bot
-            tg.sendData(JSON.stringify(data));
+               const soan =
+                  document.getElementById(
+                     "soan"
+                  ).value;
+
+               const giao =
+                  document.getElementById(
+                     "giao"
+                  ).value;
+
+               const soKien =
+                  document.getElementById(
+                     "so_kien"
+                  ).value;
+
+               if (!dong) {
+                  showError(
+                     "Vui lòng chọn người đóng."
+                  );
+                  return;
+               }
+
+               if (!soan) {
+                  showError(
+                     "Vui lòng chọn người soạn."
+                  );
+                  return;
+               }
+
+               if (!giao) {
+                  showError(
+                     "Vui lòng chọn người giao."
+                  );
+                  return;
+               }
+
+               const data = {
+                  dong_id: dong,
+                  soan_id: soan,
+                  giao_id: giao,
+                  so_kien: Number(soKien)
+               };
+
+               console.log(
+                  "SEND DATA:",
+                  data
+               );
+
+               // Gửi về Telegram Bot
+               tg.sendData(
+                  JSON.stringify(data)
+               );
+
+            } catch (error) {
+               showError(
+                  "Lỗi submit: " +
+                  error.message
+               );
+            }
          }
+
+
+         // =========================
+         // Start
+         // =========================
+
+         loadForm();
       </script>
    </body>
 </html>
