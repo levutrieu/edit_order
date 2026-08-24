@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1">
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <title>Order Editor</title>
+</head>
+
+<body>
+
+<h3>✏️ Chỉnh sửa đơn hàng</h3>
+
+<label>Người đóng</label>
+<select id="dong"></select>
+
+<label>Người soạn</label>
+<select id="soan"></select>
+
+<label>Người giao</label>
+<select id="giao"></select>
+
+<label>Số kiện</label>
+<input id="so_kien" type="number" min="0">
+
+<button onclick="submitForm()">SUBMIT</button>
+
+<script>
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+console.log(tg.initData);
+console.log(tg.initDataUnsafe);
+
+function submitForm() {
+
+  const data = {
+    dong_id: document.getElementById("dong").value,
+    soan_id: document.getElementById("soan").value,
+    giao_id: document.getElementById("giao").value,
+    so_kien: Number(document.getElementById("so_kien").value)
+  };
+
+  // Gửi dữ liệu về Telegram Bot
+  tg.sendData(JSON.stringify(data));
+}
+</script>
+
+</body>
+</html>
