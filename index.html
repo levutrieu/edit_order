@@ -1,79 +1,75 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1,maximum-scale=1">
+   <head>
+      <meta charset="UTF-8" />
+      <meta
+         name="viewport"
+         content="width=device-width,initial-scale=1,maximum-scale=1"
+      />
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+      <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <title>Order Editor</title>
-</head>
+      <title>Order Editor</title>
+   </head>
 
-<body>
+   <body>
+      <h3>✏️ Chỉnh sửa đơn hàng</h3>
 
-<h3>✏️ Chỉnh sửa đơn hàng</h3>
+      <label>Người đóng</label>
+      <select id="dong"></select>
 
-<label>Người đóng</label>
-<select id="dong"></select>
+      <label>Người soạn</label>
+      <select id="soan"></select>
 
-<label>Người soạn</label>
-<select id="soan"></select>
+      <label>Người giao</label>
+      <select id="giao"></select>
 
-<label>Người giao</label>
-<select id="giao"></select>
+      <label>Số kiện</label>
+      <input id="so_kien" type="number" min="0" />
 
-<label>Số kiện</label>
-<input id="so_kien" type="number" min="0">
+      <button onclick="submitForm()">SUBMIT</button>
 
-<button onclick="submitForm()">SUBMIT</button>
+      <script>
+         const tg = window.Telegram.WebApp;
 
-<script>
-const tg = window.Telegram.WebApp;
+         tg.ready();
+         tg.expand();
 
-tg.ready();
-tg.expand();
+         console.log(tg.initData);
+         console.log(tg.initDataUnsafe);
 
-console.log(tg.initData);
-console.log(tg.initDataUnsafe);
+         tg.ready();
+         tg.expand();
 
+         const startapp = tg.initDataUnsafe.start_param;
 
-  const tg = window.Telegram.WebApp;
+         function decodeBase64Url(str) {
+            str = str.replace(/-/g, "+").replace(/_/g, "/");
 
-tg.ready();
-tg.expand();
+            while (str.length % 4) {
+               str += "=";
+            }
 
-const startapp = tg.initDataUnsafe.start_param;
+            const bytes = Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
 
-function decodeBase64Url(str) {
-  str = str.replace(/-/g, '+').replace(/_/g, '/');
+            return new TextDecoder().decode(bytes);
+         }
 
-  while (str.length % 4) {
-    str += '=';
-  }
+         const payload = JSON.parse(decodeBase64Url(startapp));
 
-  const bytes = Uint8Array.from(atob(str), c => c.charCodeAt(0));
+         console.log(payload);
 
-  return new TextDecoder().decode(bytes);
-}
+         function submitForm() {
+            const data = {
+               dong_id: document.getElementById("dong").value,
+               soan_id: document.getElementById("soan").value,
+               giao_id: document.getElementById("giao").value,
+               so_kien: Number(document.getElementById("so_kien").value),
+            };
 
-const payload = JSON.parse(decodeBase64Url(startapp));
-
-console.log(payload);
-
-function submitForm() {
-
-  const data = {
-    dong_id: document.getElementById("dong").value,
-    soan_id: document.getElementById("soan").value,
-    giao_id: document.getElementById("giao").value,
-    so_kien: Number(document.getElementById("so_kien").value)
-  };
-
-  // Gửi dữ liệu về Telegram Bot
-  tg.sendData(JSON.stringify(data));
-}
-</script>
-
-</body>
+            // Gửi dữ liệu về Telegram Bot
+            tg.sendData(JSON.stringify(data));
+         }
+      </script>
+   </body>
 </html>
