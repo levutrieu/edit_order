@@ -1,431 +1,608 @@
 <!DOCTYPE html>
 <html lang="vi">
-   <head>
-      <meta charset="UTF-8" />
+<head>
+   <meta charset="UTF-8" />
 
-      <meta
-         name="viewport"
-         content="width=device-width, initial-scale=1, maximum-scale=1"
-      />
+   <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1"
+   />
 
-      <script src="https://telegram.org/js/telegram-web-app.js"></script>
+   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-      <title>Order Editor</title>
+   <title>Order Editor</title>
 
-      <style>
-         * {
-            box-sizing: border-box;
-         }
+   <style>
+      * {
+         box-sizing: border-box;
+      }
 
-         body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: #f5f7fa;
-            color: #222;
-         }
+      body {
+         margin: 0;
+         padding: 20px;
+         font-family: Arial, sans-serif;
+         background: #f5f7fa;
+         color: #222;
+      }
 
-         .container {
-            max-width: 500px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-         }
+      .container {
+         max-width: 500px;
+         margin: auto;
+         background: #fff;
+         padding: 20px;
+         border-radius: 14px;
+         box-shadow: 0 4px 18px rgba(0,0,0,.08);
+      }
 
-         h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-         }
+      h3 {
+         margin-top: 0;
+         margin-bottom: 20px;
+      }
 
-         label {
-            display: block;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            font-weight: 600;
-         }
+      label {
+         display: block;
+         margin-top: 14px;
+         margin-bottom: 6px;
+         font-weight: 600;
+      }
 
-         select,
-         input {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #d0d5dd;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-         }
+      select,
+      input {
+         width: 100%;
+         padding: 11px 12px;
+         border: 1px solid #d0d5dd;
+         border-radius: 8px;
+         font-size: 16px;
+         background: #fff;
+      }
 
-         button {
-            width: 100%;
-            margin-top: 22px;
-            padding: 12px;
-            border: 0;
-            border-radius: 8px;
-            background: #0088cc;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-         }
+      select[multiple] {
+         min-height: 120px;
+      }
 
-         button:active {
-            opacity: 0.8;
-         }
+      .hint {
+         margin-top: 4px;
+         font-size: 12px;
+         color: #667085;
+      }
 
-         #error {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            background: #fee4e2;
-            color: #b42318;
-            font-size: 14px;
-         }
-      </style>
-   </head>
+      button {
+         width: 100%;
+         margin-top: 22px;
+         padding: 12px;
+         border: 0;
+         border-radius: 8px;
+         background: #0088cc;
+         color: white;
+         font-size: 16px;
+         font-weight: 600;
+         cursor: pointer;
+      }
 
-   <body>
-      <div class="container">
-         <h3>✏️ Chỉnh sửa đơn hàng</h3>
+      button:active {
+         opacity: .8;
+      }
 
-         <label for="dong">Người đóng</label>
-         <select id="dong">
-            <option value="">-- Chọn người đóng --</option>
-         </select>
+      #error {
+         display: none;
+         margin-top: 15px;
+         padding: 10px;
+         border-radius: 8px;
+         background: #fee4e2;
+         color: #b42318;
+         font-size: 14px;
+      }
+   </style>
+</head>
 
-         <label for="soan">Người soạn</label>
-         <select id="soan">
-            <option value="">-- Chọn người soạn --</option>
-         </select>
+<body>
 
-         <label for="giao">Người giao</label>
-         <select id="giao">
-            <option value="">-- Chọn người giao --</option>
-         </select>
+<div class="container">
 
-         <label for="so_kien">Số kiện</label>
-         <input
-            id="so_kien"
-            type="number"
-            min="0"
-            step="1"
-            value="0"
-         />
+   <h3>✏️ Chỉnh sửa đơn hàng</h3>
 
-         <button type="button" onclick="submitForm()">
-            SUBMIT
-         </button>
+   <!-- Người đóng -->
+   <label for="dong">
+      Người đóng
+   </label>
 
-         <div id="error"></div>
-      </div>
+   <select id="dong" multiple></select>
 
-      <script>
-         const tg = window.Telegram.WebApp;
-
-         // =========================
-         // Telegram init
-         // =========================
-
-         tg.ready();
-         tg.expand();
-
-         console.log("Telegram initData:", tg.initData);
-         console.log("Telegram initDataUnsafe:", tg.initDataUnsafe);
+   <div class="hint">
+      Có thể chọn nhiều người bằng Ctrl / Command
+   </div>
 
 
-         // =========================
-         // Hiển thị lỗi
-         // =========================
+   <!-- Người soạn -->
+   <label for="soan">
+      Người soạn
+   </label>
 
-         function showError(message) {
-            const error = document.getElementById("error");
+   <select id="soan" multiple></select>
 
-            error.innerText = message;
-            error.style.display = "block";
-
-            console.error(message);
-         }
+   <div class="hint">
+      Có thể chọn nhiều người bằng Ctrl / Command
+   </div>
 
 
-         // =========================
-         // Base64URL decode
-         // =========================
+   <!-- Người giao -->
+   <label for="giao">
+      Người giao
+   </label>
 
-         function decodeBase64Url(str) {
-            if (!str) {
-               throw new Error(
-                  "Không có Telegram start_param."
-               );
-            }
+   <select id="giao" multiple></select>
 
-            str = String(str)
-               .replace(/-/g, "+")
-               .replace(/_/g, "/");
-
-            while (str.length % 4 !== 0) {
-               str += "=";
-            }
-
-            const binary = atob(str);
-
-            const bytes = Uint8Array.from(
-               binary,
-               (c) => c.charCodeAt(0)
-            );
-
-            return new TextDecoder("utf-8").decode(bytes);
-         }
+   <div class="hint">
+      Có thể chọn nhiều người bằng Ctrl / Command
+   </div>
 
 
-         // =========================
-         // Lấy payload từ start_param
-         // =========================
+   <!-- Số kiện -->
+   <label for="so_kien">
+      Số kiện
+   </label>
 
-         function getPayload() {
-            const startParam =
-               tg.initDataUnsafe?.start_param;
-
-            console.log(
-               "start_param:",
-               startParam
-            );
-
-            if (!startParam) {
-               throw new Error(
-                  "Không tìm thấy start_param. " +
-                  "Mini App phải được mở từ Telegram với start_param."
-               );
-            }
-
-            let decoded;
-
-            try {
-               decoded = decodeBase64Url(startParam);
-            } catch (e) {
-               throw new Error(
-                  "Không thể decode start_param: " +
-                  e.message
-               );
-            }
-
-            console.log(
-               "Decoded start_param:",
-               decoded
-            );
-
-            try {
-               return JSON.parse(decoded);
-            } catch (e) {
-               throw new Error(
-                  "start_param không phải JSON hợp lệ: " +
-                  decoded
-               );
-            }
-         }
+   <input
+      id="so_kien"
+      type="number"
+      min="0"
+      step="1"
+      value="0"
+   />
 
 
-         // =========================
-         // Tạo option cho select
-         // =========================
+   <button type="button" onclick="submitForm()">
+      SUBMIT
+   </button>
 
-         function fillSelect(
-            elementId,
-            employees,
-            placeholder
+   <div id="error"></div>
+
+</div>
+
+
+<script>
+
+   const tg = window.Telegram.WebApp;
+
+   tg.ready();
+   tg.expand();
+
+
+   // =====================================================
+   // ERROR
+   // =====================================================
+
+   function showError(message) {
+
+      const error =
+         document.getElementById("error");
+
+      error.innerText = message;
+      error.style.display = "block";
+
+      console.error(message);
+   }
+
+
+   function clearError() {
+
+      const error =
+         document.getElementById("error");
+
+      error.innerText = "";
+      error.style.display = "none";
+   }
+
+
+   // =====================================================
+   // BASE64URL DECODE
+   // =====================================================
+
+   function decodeBase64Url(str) {
+
+      str = String(str)
+         .replace(/-/g, "+")
+         .replace(/_/g, "/");
+
+      while (str.length % 4) {
+         str += "=";
+      }
+
+      const binary = atob(str);
+
+      const bytes =
+         Uint8Array.from(
+            binary,
+            c => c.charCodeAt(0)
+         );
+
+      return new TextDecoder("utf-8")
+         .decode(bytes);
+   }
+
+
+   // =====================================================
+   // GET PAYLOAD
+   // =====================================================
+
+   function getPayload() {
+
+      const startapp =
+         tg.initDataUnsafe?.start_param;
+
+      console.log(
+         "startapp:",
+         startapp
+      );
+
+
+      // Cho phép mở trực tiếp để test
+      if (!startapp) {
+
+         console.warn(
+            "Không có startapp - chạy chế độ TEST"
+         );
+
+         return {
+            id: 12345,
+
+            p: [
+               { id: 1, name: "An" },
+               { id: 2, name: "Bình" },
+               { id: 3, name: "Chi" },
+               { id: 4, name: "Dũng" },
+               { id: 5, name: "Hà" },
+               { id: 6, name: "Hùng" },
+               { id: 7, name: "Lan" },
+               { id: 8, name: "Linh" },
+               { id: 9, name: "Mai" },
+               { id: 10, name: "Minh" },
+               { id: 11, name: "Nam" },
+               { id: 12, name: "Nga" },
+               { id: 13, name: "Ngọc" },
+               { id: 14, name: "Phúc" },
+               { id: 15, name: "Quân" },
+               { id: 16, name: "Sơn" },
+               { id: 17, name: "Tâm" },
+               { id: 18, name: "Thảo" },
+               { id: 19, name: "Trang" },
+               { id: 20, name: "Tuấn" },
+               { id: 21, name: "Vân" },
+               { id: 22, name: "Việt" },
+               { id: 23, name: "Yến" },
+               { id: 24, name: "Khoa" },
+               { id: 25, name: "Long" }
+            ],
+
+            s: [8, 18],
+            d: [2],
+            g: [2, 15, 20],
+            k: 12
+         };
+      }
+
+
+      try {
+
+         const json =
+            decodeBase64Url(startapp);
+
+         console.log(
+            "Decoded JSON:",
+            json
+         );
+
+         const payload =
+            JSON.parse(json);
+
+         console.log(
+            "Payload:",
+            payload
+         );
+
+         return payload;
+
+      } catch (error) {
+
+         throw new Error(
+            "Không thể đọc startapp: " +
+            error.message
+         );
+      }
+   }
+
+
+   // =====================================================
+   // FILL MULTI SELECT
+   // =====================================================
+
+   function fillSelect(
+      elementId,
+      people,
+      selectedIds
+   ) {
+
+      const select =
+         document.getElementById(elementId);
+
+      select.innerHTML = "";
+
+
+      if (!Array.isArray(people)) {
+
+         console.warn(
+            "people không phải array:",
+            people
+         );
+
+         return;
+      }
+
+
+      if (!Array.isArray(selectedIds)) {
+         selectedIds = [];
+      }
+
+
+      // Đưa về string để so sánh
+      const selectedSet =
+         new Set(
+            selectedIds.map(
+               id => String(id)
+            )
+         );
+
+
+      people.forEach(person => {
+
+         const option =
+            document.createElement("option");
+
+         option.value =
+            person.id;
+
+         option.textContent =
+            person.name;
+
+         if (
+            selectedSet.has(
+               String(person.id)
+            )
          ) {
-            const select =
-               document.getElementById(elementId);
-
-            select.innerHTML = "";
-
-            const firstOption =
-               document.createElement("option");
-
-            firstOption.value = "";
-            firstOption.textContent = placeholder;
-
-            select.appendChild(firstOption);
-
-            if (!Array.isArray(employees)) {
-               return;
-            }
-
-            employees.forEach((item) => {
-               const option =
-                  document.createElement("option");
-
-               option.value =
-                  item.id ?? item.ID ?? "";
-
-               option.textContent =
-                  item.name ??
-                  item.Name ??
-                  item.title ??
-                  item.Title ??
-                  option.value;
-
-               select.appendChild(option);
-            });
+            option.selected = true;
          }
 
+         select.appendChild(option);
 
-         // =========================
-         // Load dữ liệu
-         // =========================
+      });
+   }
 
-         function loadForm() {
-            try {
-               const payload = getPayload();
 
-               console.log(
-                  "PAYLOAD:",
-                  payload
-               );
+   // =====================================================
+   // GET SELECTED IDS
+   // =====================================================
 
-               /*
-                Ví dụ payload:
+   function getSelectedIds(elementId) {
 
-                {
-                   "order_id": "DH001",
+      const select =
+         document.getElementById(elementId);
 
-                   "dong": [
-                      {
-                         "id": "NV01",
-                         "name": "Nguyễn Văn A"
-                      }
-                   ],
+      return Array.from(
+         select.selectedOptions
+      ).map(
+         option => Number(option.value)
+      );
+   }
 
-                   "soan": [
-                      {
-                         "id": "NV02",
-                         "name": "Nguyễn Văn B"
-                      }
-                   ],
 
-                   "giao": [
-                      {
-                         "id": "NV03",
-                         "name": "Nguyễn Văn C"
-                      }
-                   ],
+   // =====================================================
+   // LOAD FORM
+   // =====================================================
 
-                   "so_kien": 5
-                }
-               */
+   function loadForm() {
 
-               fillSelect(
-                  "dong",
-                  payload.dong,
-                  "-- Chọn người đóng --"
-               );
+      try {
 
-               fillSelect(
-                  "soan",
-                  payload.soan,
-                  "-- Chọn người soạn --"
-               );
+         clearError();
 
-               fillSelect(
-                  "giao",
-                  payload.giao,
-                  "-- Chọn người giao --"
-               );
+         const payload =
+            getPayload();
 
-               // Số kiện
-               if (
-                  payload.so_kien !== undefined &&
-                  payload.so_kien !== null
-               ) {
+
+         console.log(
+            "ORDER ID:",
+            payload.id
+         );
+
+         console.log(
+            "PEOPLE:",
+            payload.p
+         );
+
+
+         // -----------------------------
+         // Người đóng
+         // -----------------------------
+
+         fillSelect(
+            "dong",
+            payload.p,
+            payload.d
+         );
+
+
+         // -----------------------------
+         // Người soạn
+         // -----------------------------
+
+         fillSelect(
+            "soan",
+            payload.p,
+            payload.s
+         );
+
+
+         // -----------------------------
+         // Người giao
+         // -----------------------------
+
+         fillSelect(
+            "giao",
+            payload.p,
+            payload.g
+         );
+
+
+         // -----------------------------
+         // Số kiện
+         // -----------------------------
+
+         document.getElementById(
+            "so_kien"
+         ).value =
+            payload.k ?? 0;
+
+
+         console.log(
+            "Form loaded."
+         );
+
+      } catch (error) {
+
+         showError(
+            error.message
+         );
+      }
+   }
+
+
+   // =====================================================
+   // SUBMIT
+   // =====================================================
+
+   function submitForm() {
+
+      try {
+
+         clearError();
+
+
+         const data = {
+
+            // ID đơn hàng
+            id:
+               window.orderPayload?.id ??
+               null,
+
+            // Người đóng
+            d:
+               getSelectedIds("dong"),
+
+            // Người soạn
+            s:
+               getSelectedIds("soan"),
+
+            // Người giao
+            g:
+               getSelectedIds("giao"),
+
+            // Số kiện
+            k:
+               Number(
                   document.getElementById(
                      "so_kien"
-                  ).value = payload.so_kien;
-               }
+                  ).value
+               )
+         };
 
-            } catch (error) {
-               showError(error.message);
-            }
+
+         console.log(
+            "SEND DATA:",
+            data
+         );
+
+
+         // -----------------------------
+         // Validate
+         // -----------------------------
+
+         if (!data.d.length) {
+
+            showError(
+               "Vui lòng chọn người đóng."
+            );
+
+            return;
          }
 
 
-         // =========================
-         // Submit
-         // =========================
+         if (!data.s.length) {
 
-         function submitForm() {
-            try {
-               const dong =
-                  document.getElementById(
-                     "dong"
-                  ).value;
+            showError(
+               "Vui lòng chọn người soạn."
+            );
 
-               const soan =
-                  document.getElementById(
-                     "soan"
-                  ).value;
-
-               const giao =
-                  document.getElementById(
-                     "giao"
-                  ).value;
-
-               const soKien =
-                  document.getElementById(
-                     "so_kien"
-                  ).value;
-
-               if (!dong) {
-                  showError(
-                     "Vui lòng chọn người đóng."
-                  );
-                  return;
-               }
-
-               if (!soan) {
-                  showError(
-                     "Vui lòng chọn người soạn."
-                  );
-                  return;
-               }
-
-               if (!giao) {
-                  showError(
-                     "Vui lòng chọn người giao."
-                  );
-                  return;
-               }
-
-               const data = {
-                  dong_id: dong,
-                  soan_id: soan,
-                  giao_id: giao,
-                  so_kien: Number(soKien)
-               };
-
-               console.log(
-                  "SEND DATA:",
-                  data
-               );
-
-               // Gửi về Telegram Bot
-               tg.sendData(
-                  JSON.stringify(data)
-               );
-
-            } catch (error) {
-               showError(
-                  "Lỗi submit: " +
-                  error.message
-               );
-            }
+            return;
          }
 
 
-         // =========================
-         // Start
-         // =========================
+         if (!data.g.length) {
 
-         loadForm();
-      </script>
-   </body>
+            showError(
+               "Vui lòng chọn người giao."
+            );
+
+            return;
+         }
+
+
+         // -----------------------------
+         // Gửi về Telegram
+         // -----------------------------
+
+         tg.sendData(
+            JSON.stringify(data)
+         );
+
+      } catch (error) {
+
+         showError(
+            "Lỗi submit: " +
+            error.message
+         );
+      }
+   }
+
+
+   // =====================================================
+   // INIT
+   // =====================================================
+
+   let orderPayload = null;
+
+
+   try {
+
+      orderPayload =
+         getPayload();
+
+      // lưu để submit
+      window.orderPayload =
+         orderPayload;
+
+   } catch (error) {
+
+      showError(
+         error.message
+      );
+   }
+
+
+   if (orderPayload) {
+      loadForm();
+   }
+
+</script>
+
+</body>
 </html>
