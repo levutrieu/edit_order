@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-   <meta charset="UTF-8" />
+   <meta charset="UTF-8">
 
    <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1"
-   />
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
+   >
 
    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -17,80 +17,309 @@
          box-sizing: border-box;
       }
 
+      :root {
+         --bg: var(--tg-theme-bg-color, #f4f6f8);
+         --card: var(--tg-theme-secondary-bg-color, #ffffff);
+         --text: var(--tg-theme-text-color, #222222);
+         --hint: var(--tg-theme-hint-color, #777777);
+         --button: var(--tg-theme-button-color, #2481cc);
+         --button-text: var(--tg-theme-button-text-color, #ffffff);
+         --border: #e2e5e9;
+         --selected: #e8f3ff;
+      }
+
+      html,
       body {
          margin: 0;
-         padding: 20px;
-         font-family: Arial, sans-serif;
-         background: #f5f7fa;
-         color: #222;
+         padding: 0;
+         background: var(--bg);
+         color: var(--text);
+         font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            Arial,
+            sans-serif;
+      }
+
+      body {
+         padding: 14px;
+         padding-bottom: 90px;
       }
 
       .container {
-         max-width: 500px;
+         width: 100%;
+         max-width: 520px;
          margin: auto;
-         background: #fff;
-         padding: 20px;
+      }
+
+      .header {
+         margin-bottom: 18px;
+      }
+
+      .title {
+         font-size: 22px;
+         font-weight: 700;
+         margin: 0;
+      }
+
+      .order-info {
+         margin-top: 5px;
+         color: var(--hint);
+         font-size: 13px;
+      }
+
+      .section {
+         background: var(--card);
          border-radius: 14px;
-         box-shadow: 0 4px 18px rgba(0,0,0,.08);
+         padding: 14px;
+         margin-bottom: 12px;
+         box-shadow: 0 1px 4px rgba(0,0,0,.06);
       }
 
-      h3 {
-         margin-top: 0;
-         margin-bottom: 20px;
+      .section-title {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         margin-bottom: 10px;
       }
 
-      label {
-         display: block;
-         margin-top: 14px;
-         margin-bottom: 6px;
-         font-weight: 600;
+      .section-title-left {
+         font-size: 15px;
+         font-weight: 700;
       }
 
-      select,
-      input {
-         width: 100%;
-         padding: 11px 12px;
-         border: 1px solid #d0d5dd;
-         border-radius: 8px;
-         font-size: 16px;
-         background: #fff;
-      }
-
-      select[multiple] {
-         min-height: 120px;
-      }
-
-      .hint {
-         margin-top: 4px;
+      .count {
          font-size: 12px;
-         color: #667085;
+         color: var(--hint);
       }
 
-      button {
+      /* =========================================
+         PEOPLE SELECTOR
+         ========================================= */
+
+      .people-box {
+         border: 1px solid var(--border);
+         border-radius: 11px;
+         overflow: hidden;
+      }
+
+      .search-box {
+         position: relative;
+         border-bottom: 1px solid var(--border);
+      }
+
+      .search-box input {
          width: 100%;
-         margin-top: 22px;
-         padding: 12px;
          border: 0;
-         border-radius: 8px;
-         background: #0088cc;
-         color: white;
+         outline: 0;
+         padding: 11px 12px 11px 38px;
+         background: transparent;
+         color: var(--text);
+         font-size: 15px;
+      }
+
+      .search-icon {
+         position: absolute;
+         left: 12px;
+         top: 50%;
+         transform: translateY(-50%);
+         color: var(--hint);
          font-size: 16px;
+      }
+
+      .selected-chips {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 6px;
+         padding: 9px;
+         border-bottom: 1px solid var(--border);
+      }
+
+      .selected-chips:empty {
+         display: none;
+      }
+
+      .chip {
+         display: inline-flex;
+         align-items: center;
+         gap: 5px;
+         padding: 5px 9px;
+         border-radius: 20px;
+         background: var(--selected);
+         color: var(--button);
+         font-size: 13px;
          font-weight: 600;
+      }
+
+      .chip-remove {
+         border: 0;
+         background: transparent;
+         color: inherit;
+         padding: 0;
+         margin: 0;
+         font-size: 16px;
+         line-height: 14px;
          cursor: pointer;
       }
 
-      button:active {
+      .people-list {
+         max-height: 220px;
+         overflow-y: auto;
+      }
+
+      .person {
+         display: flex;
+         align-items: center;
+         min-height: 48px;
+         padding: 8px 11px;
+         cursor: pointer;
+         border-bottom: 1px solid rgba(0,0,0,.04);
+         -webkit-tap-highlight-color: transparent;
+      }
+
+      .person:last-child {
+         border-bottom: 0;
+      }
+
+      .person:active {
+         background: var(--selected);
+      }
+
+      .person-info {
+         flex: 1;
+         min-width: 0;
+         margin-left: 10px;
+      }
+
+      .person-name {
+         font-size: 15px;
+         font-weight: 500;
+      }
+
+      .person-id {
+         margin-top: 2px;
+         font-size: 11px;
+         color: var(--hint);
+      }
+
+      /* =========================================
+         CUSTOM CHECKBOX
+         ========================================= */
+
+      .checkbox {
+         width: 22px;
+         height: 22px;
+         flex: 0 0 22px;
+         border: 2px solid #c8cdd3;
+         border-radius: 6px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         transition: .15s;
+      }
+
+      .person.selected .checkbox {
+         background: var(--button);
+         border-color: var(--button);
+      }
+
+      .person.selected .checkbox::after {
+         content: "✓";
+         color: white;
+         font-size: 14px;
+         font-weight: 700;
+      }
+
+      .empty {
+         padding: 18px;
+         text-align: center;
+         color: var(--hint);
+         font-size: 13px;
+      }
+
+      /* =========================================
+         NUMBER INPUT
+         ========================================= */
+
+      .number-input {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+      }
+
+      .number-input button {
+         width: 42px;
+         height: 42px;
+         border: 0;
+         border-radius: 10px;
+         background: var(--bg);
+         color: var(--text);
+         font-size: 22px;
+         cursor: pointer;
+      }
+
+      .number-input input {
+         flex: 1;
+         min-width: 0;
+         height: 42px;
+         border: 1px solid var(--border);
+         border-radius: 10px;
+         text-align: center;
+         font-size: 18px;
+         font-weight: 600;
+         background: transparent;
+         color: var(--text);
+         outline: none;
+      }
+
+      /* =========================================
+         BUTTON
+         ========================================= */
+
+      .submit-button {
+         width: 100%;
+         height: 48px;
+         border: 0;
+         border-radius: 12px;
+         background: var(--button);
+         color: var(--button-text);
+         font-size: 16px;
+         font-weight: 700;
+         cursor: pointer;
+      }
+
+      .submit-button:active {
          opacity: .8;
       }
 
+      .submit-button:disabled {
+         opacity: .5;
+      }
+
+      /* =========================================
+         ERROR
+         ========================================= */
+
       #error {
          display: none;
-         margin-top: 15px;
-         padding: 10px;
-         border-radius: 8px;
+         margin-top: 12px;
+         padding: 11px;
+         border-radius: 10px;
          background: #fee4e2;
          color: #b42318;
-         font-size: 14px;
+         font-size: 13px;
+      }
+
+      /* =========================================
+         LOADING
+         ========================================= */
+
+      .loading {
+         text-align: center;
+         padding: 30px;
+         color: var(--hint);
       }
    </style>
 </head>
@@ -99,61 +328,146 @@
 
 <div class="container">
 
-   <h3>✏️ Chỉnh sửa đơn hàng</h3>
+   <div class="header">
+      <h1 class="title">✏️ Chỉnh sửa đơn hàng</h1>
 
-   <!-- Người đóng -->
-   <label for="dong">
-      Người đóng
-   </label>
-
-   <select id="dong" multiple></select>
-
-   <div class="hint">
-      Có thể chọn nhiều người bằng Ctrl / Command
+      <div class="order-info">
+         Đơn hàng: <strong id="orderId">...</strong>
+      </div>
    </div>
 
 
-   <!-- Người soạn -->
-   <label for="soan">
-      Người soạn
-   </label>
+   <!-- ================================
+        NGƯỜI ĐÓNG
+        ================================= -->
 
-   <select id="soan" multiple></select>
+   <div class="section">
 
-   <div class="hint">
-      Có thể chọn nhiều người bằng Ctrl / Command
+      <div class="section-title">
+         <div class="section-title-left">
+            📦 Người đóng
+         </div>
+
+         <div
+            class="count"
+            id="dongCount"
+         >
+            0 người
+         </div>
+      </div>
+
+      <div
+         class="people-box"
+         id="dongBox"
+      ></div>
+
    </div>
 
 
-   <!-- Người giao -->
-   <label for="giao">
-      Người giao
-   </label>
+   <!-- ================================
+        NGƯỜI SOẠN
+        ================================= -->
 
-   <select id="giao" multiple></select>
+   <div class="section">
 
-   <div class="hint">
-      Có thể chọn nhiều người bằng Ctrl / Command
+      <div class="section-title">
+         <div class="section-title-left">
+            📝 Người soạn
+         </div>
+
+         <div
+            class="count"
+            id="soanCount"
+         >
+            0 người
+         </div>
+      </div>
+
+      <div
+         class="people-box"
+         id="soanBox"
+      ></div>
+
    </div>
 
 
-   <!-- Số kiện -->
-   <label for="so_kien">
-      Số kiện
-   </label>
+   <!-- ================================
+        NGƯỜI GIAO
+        ================================= -->
 
-   <input
-      id="so_kien"
-      type="number"
-      min="0"
-      step="1"
-      value="0"
-   />
+   <div class="section">
+
+      <div class="section-title">
+         <div class="section-title-left">
+            🚚 Người giao
+         </div>
+
+         <div
+            class="count"
+            id="giaoCount"
+         >
+            0 người
+         </div>
+      </div>
+
+      <div
+         class="people-box"
+         id="giaoBox"
+      ></div>
+
+   </div>
 
 
-   <button type="button" onclick="submitForm()">
-      SUBMIT
+   <!-- ================================
+        SỐ KIỆN
+        ================================= -->
+
+   <div class="section">
+
+      <div class="section-title">
+         <div class="section-title-left">
+            📦 Số kiện
+         </div>
+      </div>
+
+      <div class="number-input">
+
+         <button
+            type="button"
+            onclick="changeQuantity(-1)"
+         >
+            −
+         </button>
+
+         <input
+            id="so_kien"
+            type="number"
+            min="0"
+            step="1"
+            value="0"
+         >
+
+         <button
+            type="button"
+            onclick="changeQuantity(1)"
+         >
+            +
+         </button>
+
+      </div>
+
+   </div>
+
+
+   <button
+      id="submitButton"
+      class="submit-button"
+      type="button"
+      onclick="submitForm()"
+   >
+      ✓ LƯU ĐƠN HÀNG
    </button>
+
 
    <div id="error"></div>
 
@@ -162,10 +476,45 @@
 
 <script>
 
+   // =====================================================
+   // TELEGRAM
+   // =====================================================
+
    const tg = window.Telegram.WebApp;
 
    tg.ready();
    tg.expand();
+
+   // Cho Telegram biết màu header
+   if (tg.setHeaderColor) {
+      tg.setHeaderColor(
+         tg.themeParams.bg_color ||
+         "#f4f6f8"
+      );
+   }
+
+
+   // =====================================================
+   // GLOBAL DATA
+   // =====================================================
+
+   let orderPayload = null;
+
+   /*
+      selections:
+
+      {
+         dong: Set([2]),
+         soan: Set([8,18]),
+         giao: Set([2,15,20])
+      }
+   */
+
+   const selections = {
+      dong: new Set(),
+      soan: new Set(),
+      giao: new Set()
+   };
 
 
    // =====================================================
@@ -174,23 +523,26 @@
 
    function showError(message) {
 
-      const error =
+      const el =
          document.getElementById("error");
 
-      error.innerText = message;
-      error.style.display = "block";
+      el.textContent = message;
+      el.style.display = "block";
 
-      console.error(message);
+      window.scrollTo({
+         top: document.body.scrollHeight,
+         behavior: "smooth"
+      });
    }
 
 
    function clearError() {
 
-      const error =
+      const el =
          document.getElementById("error");
 
-      error.innerText = "";
-      error.style.display = "none";
+      el.textContent = "";
+      el.style.display = "none";
    }
 
 
@@ -204,7 +556,7 @@
          .replace(/-/g, "+")
          .replace(/_/g, "/");
 
-      while (str.length % 4) {
+      while (str.length % 4 !== 0) {
          str += "=";
       }
 
@@ -231,16 +583,19 @@
          tg.initDataUnsafe?.start_param;
 
       console.log(
-         "startapp:",
+         "Telegram startapp:",
          startapp
       );
 
 
-      // Cho phép mở trực tiếp để test
+      // =========================================
+      // TEST MODE
+      // =========================================
+
       if (!startapp) {
 
          console.warn(
-            "Không có startapp - chạy chế độ TEST"
+            "Không có startapp → TEST MODE"
          );
 
          return {
@@ -282,13 +637,17 @@
       }
 
 
+      // =========================================
+      // DECODE
+      // =========================================
+
       try {
 
          const json =
             decodeBase64Url(startapp);
 
          console.log(
-            "Decoded JSON:",
+            "Decoded:",
             json
          );
 
@@ -304,77 +663,402 @@
 
       } catch (error) {
 
+         console.error(
+            error
+         );
+
          throw new Error(
-            "Không thể đọc startapp: " +
-            error.message
+            "Không đọc được dữ liệu startapp."
          );
       }
    }
 
 
    // =====================================================
-   // FILL MULTI SELECT
+   // CREATE PEOPLE SELECTOR
    // =====================================================
 
-   function fillSelect(
-      elementId,
+   function createPeopleSelector(
+      boxId,
+      type,
       people,
       selectedIds
    ) {
 
-      const select =
-         document.getElementById(elementId);
+      const box =
+         document.getElementById(boxId);
 
-      select.innerHTML = "";
+      box.innerHTML = "";
 
 
-      if (!Array.isArray(people)) {
+      // -----------------------------------------
+      // SEARCH
+      // -----------------------------------------
 
-         console.warn(
-            "people không phải array:",
-            people
-         );
+      const searchBox =
+         document.createElement("div");
 
-         return;
+      searchBox.className =
+         "search-box";
+
+      searchBox.innerHTML = `
+         <span class="search-icon">⌕</span>
+         <input
+            type="search"
+            placeholder="Tìm tên..."
+            autocomplete="off"
+         >
+      `;
+
+      box.appendChild(searchBox);
+
+
+      // -----------------------------------------
+      // CHIPS
+      // -----------------------------------------
+
+      const chips =
+         document.createElement("div");
+
+      chips.className =
+         "selected-chips";
+
+      chips.id =
+         `${type}Chips`;
+
+      box.appendChild(chips);
+
+
+      // -----------------------------------------
+      // PEOPLE LIST
+      // -----------------------------------------
+
+      const list =
+         document.createElement("div");
+
+      list.className =
+         "people-list";
+
+      list.id =
+         `${type}List`;
+
+      box.appendChild(list);
+
+
+      // -----------------------------------------
+      // INITIAL SELECTION
+      // -----------------------------------------
+
+      if (Array.isArray(selectedIds)) {
+
+         selectedIds.forEach(id => {
+
+            selections[type].add(
+               String(id)
+            );
+
+         });
       }
 
 
-      if (!Array.isArray(selectedIds)) {
-         selectedIds = [];
-      }
+      // -----------------------------------------
+      // RENDER PEOPLE
+      // -----------------------------------------
+
+      function renderPeople(
+         filter = ""
+      ) {
+
+         list.innerHTML = "";
+
+         const keyword =
+            filter
+               .trim()
+               .toLowerCase();
 
 
-      // Đưa về string để so sánh
-      const selectedSet =
-         new Set(
-            selectedIds.map(
-               id => String(id)
-            )
-         );
+         const filtered =
+            people.filter(person => {
+
+               if (!keyword) {
+                  return true;
+               }
+
+               return String(person.name)
+                  .toLowerCase()
+                  .includes(keyword);
+
+            });
 
 
-      people.forEach(person => {
+         if (!filtered.length) {
 
-         const option =
-            document.createElement("option");
+            list.innerHTML = `
+               <div class="empty">
+                  Không tìm thấy người phù hợp
+               </div>
+            `;
 
-         option.value =
-            person.id;
-
-         option.textContent =
-            person.name;
-
-         if (
-            selectedSet.has(
-               String(person.id)
-            )
-         ) {
-            option.selected = true;
+            return;
          }
 
-         select.appendChild(option);
 
-      });
+         filtered.forEach(person => {
+
+            const id =
+               String(person.id);
+
+            const selected =
+               selections[type].has(id);
+
+
+            const row =
+               document.createElement("div");
+
+            row.className =
+               "person" +
+               (selected ? " selected" : "");
+
+
+            row.dataset.id = id;
+
+
+            row.innerHTML = `
+               <div class="checkbox"></div>
+
+               <div class="person-info">
+                  <div class="person-name">
+                     ${escapeHtml(person.name)}
+                  </div>
+
+                  <div class="person-id">
+                     ID: ${escapeHtml(id)}
+                  </div>
+               </div>
+            `;
+
+
+            row.addEventListener(
+               "click",
+               () => {
+
+                  togglePerson(
+                     type,
+                     person.id
+                  );
+
+                  renderPeople(
+                     searchBox
+                        .querySelector("input")
+                        .value
+                  );
+
+                  renderChips();
+
+                  updateCount();
+
+               }
+            );
+
+
+            list.appendChild(row);
+
+         });
+
+      }
+
+
+      // -----------------------------------------
+      // RENDER CHIPS
+      // -----------------------------------------
+
+      function renderChips() {
+
+         chips.innerHTML = "";
+
+
+         people.forEach(person => {
+
+            const id =
+               String(person.id);
+
+            if (
+               !selections[type].has(id)
+            ) {
+               return;
+            }
+
+
+            const chip =
+               document.createElement("div");
+
+            chip.className =
+               "chip";
+
+
+            chip.innerHTML = `
+               <span>
+                  ${escapeHtml(person.name)}
+               </span>
+
+               <button
+                  type="button"
+                  class="chip-remove"
+               >
+                  ×
+               </button>
+            `;
+
+
+            chip
+               .querySelector(".chip-remove")
+               .addEventListener(
+                  "click",
+                  event => {
+
+                     event.stopPropagation();
+
+                     selections[type].delete(
+                        id
+                     );
+
+                     renderPeople(
+                        searchBox
+                           .querySelector("input")
+                           .value
+                     );
+
+                     renderChips();
+
+                     updateCount();
+
+                  }
+               );
+
+
+            chips.appendChild(chip);
+
+         });
+
+      }
+
+
+      // -----------------------------------------
+      // SEARCH EVENT
+      // -----------------------------------------
+
+      searchBox
+         .querySelector("input")
+         .addEventListener(
+            "input",
+            event => {
+
+               renderPeople(
+                  event.target.value
+               );
+
+            }
+         );
+
+
+      // -----------------------------------------
+      // FIRST RENDER
+      // -----------------------------------------
+
+      renderPeople();
+
+      renderChips();
+
+      updateCount();
+   }
+
+
+   // =====================================================
+   // TOGGLE PERSON
+   // =====================================================
+
+   function togglePerson(
+      type,
+      id
+   ) {
+
+      id = String(id);
+
+      if (
+         selections[type].has(id)
+      ) {
+
+         selections[type].delete(id);
+
+      } else {
+
+         selections[type].add(id);
+
+      }
+   }
+
+
+   // =====================================================
+   // COUNT
+   // =====================================================
+
+   function updateCount() {
+
+      document.getElementById(
+         "dongCount"
+      ).textContent =
+         `${selections.dong.size} người`;
+
+
+      document.getElementById(
+         "soanCount"
+      ).textContent =
+         `${selections.soan.size} người`;
+
+
+      document.getElementById(
+         "giaoCount"
+      ).textContent =
+         `${selections.giao.size} người`;
+   }
+
+
+   // =====================================================
+   // HTML ESCAPE
+   // =====================================================
+
+   function escapeHtml(value) {
+
+      return String(value)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+   }
+
+
+   // =====================================================
+   // QUANTITY
+   // =====================================================
+
+   function changeQuantity(delta) {
+
+      const input =
+         document.getElementById(
+            "so_kien"
+         );
+
+      let value =
+         Number(input.value) || 0;
+
+      value += delta;
+
+      if (value < 0) {
+         value = 0;
+      }
+
+      input.value = value;
    }
 
 
@@ -382,194 +1066,130 @@
    // GET SELECTED IDS
    // =====================================================
 
-   function getSelectedIds(elementId) {
-
-      const select =
-         document.getElementById(elementId);
+   function getSelectedIds(type) {
 
       return Array.from(
-         select.selectedOptions
+         selections[type]
       ).map(
-         option => Number(option.value)
+         id => Number(id)
       );
    }
 
 
    // =====================================================
-   // LOAD FORM
-   // =====================================================
-
-   function loadForm() {
-
-      try {
-
-         clearError();
-
-         const payload =
-            getPayload();
-
-
-         console.log(
-            "ORDER ID:",
-            payload.id
-         );
-
-         console.log(
-            "PEOPLE:",
-            payload.p
-         );
-
-
-         // -----------------------------
-         // Người đóng
-         // -----------------------------
-
-         fillSelect(
-            "dong",
-            payload.p,
-            payload.d
-         );
-
-
-         // -----------------------------
-         // Người soạn
-         // -----------------------------
-
-         fillSelect(
-            "soan",
-            payload.p,
-            payload.s
-         );
-
-
-         // -----------------------------
-         // Người giao
-         // -----------------------------
-
-         fillSelect(
-            "giao",
-            payload.p,
-            payload.g
-         );
-
-
-         // -----------------------------
-         // Số kiện
-         // -----------------------------
-
-         document.getElementById(
-            "so_kien"
-         ).value =
-            payload.k ?? 0;
-
-
-         console.log(
-            "Form loaded."
-         );
-
-      } catch (error) {
-
-         showError(
-            error.message
-         );
-      }
-   }
-
-
-   // =====================================================
-   // SUBMIT
+   // SUBMIT → TELEGRAM
    // =====================================================
 
    function submitForm() {
 
-      try {
-
-         clearError();
+      clearError();
 
 
-         const data = {
+      const data = {
 
-            // ID đơn hàng
-            id:
-               window.orderPayload?.id ??
-               null,
+         // ID đơn
+         id: orderPayload.id,
 
-            // Người đóng
-            d:
-               getSelectedIds("dong"),
+         // Người đóng
+         d: getSelectedIds("dong"),
 
-            // Người soạn
-            s:
-               getSelectedIds("soan"),
+         // Người soạn
+         s: getSelectedIds("soan"),
 
-            // Người giao
-            g:
-               getSelectedIds("giao"),
+         // Người giao
+         g: getSelectedIds("giao"),
 
-            // Số kiện
-            k:
-               Number(
-                  document.getElementById(
-                     "so_kien"
-                  ).value
-               )
-         };
+         // Số kiện
+         k:
+            Number(
+               document.getElementById(
+                  "so_kien"
+               ).value
+            ) || 0
+      };
 
 
-         console.log(
-            "SEND DATA:",
-            data
+      console.log(
+         "SEND TO TELEGRAM:",
+         data
+      );
+
+
+      // -----------------------------------------
+      // VALIDATE
+      // -----------------------------------------
+
+      if (!data.d.length) {
+
+         showError(
+            "Vui lòng chọn ít nhất một người đóng."
          );
 
-
-         // -----------------------------
-         // Validate
-         // -----------------------------
-
-         if (!data.d.length) {
-
-            showError(
-               "Vui lòng chọn người đóng."
-            );
-
-            return;
-         }
+         return;
+      }
 
 
-         if (!data.s.length) {
+      if (!data.s.length) {
 
-            showError(
-               "Vui lòng chọn người soạn."
-            );
+         showError(
+            "Vui lòng chọn ít nhất một người soạn."
+         );
 
-            return;
-         }
-
-
-         if (!data.g.length) {
-
-            showError(
-               "Vui lòng chọn người giao."
-            );
-
-            return;
-         }
+         return;
+      }
 
 
-         // -----------------------------
-         // Gửi về Telegram
-         // -----------------------------
+      if (!data.g.length) {
+
+         showError(
+            "Vui lòng chọn ít nhất một người giao."
+         );
+
+         return;
+      }
+
+
+      // -----------------------------------------
+      // DISABLE BUTTON
+      // -----------------------------------------
+
+      const button =
+         document.getElementById(
+            "submitButton"
+         );
+
+      button.disabled = true;
+
+      button.textContent =
+         "Đang gửi...";
+
+
+      // -----------------------------------------
+      // SEND DATA TO TELEGRAM BOT
+      // -----------------------------------------
+
+      try {
 
          tg.sendData(
             JSON.stringify(data)
          );
 
+         console.log(
+            "Đã gửi dữ liệu về Telegram Bot"
+         );
+
       } catch (error) {
 
+         button.disabled = false;
+
+         button.textContent =
+            "✓ LƯU ĐƠN HÀNG";
+
          showError(
-            "Lỗi submit: " +
+            "Không thể gửi dữ liệu về Telegram: " +
             error.message
          );
+
       }
    }
 
@@ -578,29 +1198,99 @@
    // INIT
    // =====================================================
 
-   let orderPayload = null;
+   function init() {
+
+      try {
+
+         orderPayload =
+            getPayload();
 
 
-   try {
+         if (!orderPayload) {
+            return;
+         }
 
-      orderPayload =
-         getPayload();
 
-      // lưu để submit
-      window.orderPayload =
-         orderPayload;
+         // -----------------------------------------
+         // ORDER ID
+         // -----------------------------------------
 
-   } catch (error) {
+         document.getElementById(
+            "orderId"
+         ).textContent =
+            orderPayload.id;
 
-      showError(
-         error.message
-      );
+
+         // -----------------------------------------
+         // PEOPLE
+         // -----------------------------------------
+
+         const people =
+            Array.isArray(orderPayload.p)
+               ? orderPayload.p
+               : [];
+
+
+         // -----------------------------------------
+         // DONG
+         // -----------------------------------------
+
+         createPeopleSelector(
+            "dongBox",
+            "dong",
+            people,
+            orderPayload.d
+         );
+
+
+         // -----------------------------------------
+         // SOAN
+         // -----------------------------------------
+
+         createPeopleSelector(
+            "soanBox",
+            "soan",
+            people,
+            orderPayload.s
+         );
+
+
+         // -----------------------------------------
+         // GIAO
+         // -----------------------------------------
+
+         createPeopleSelector(
+            "giaoBox",
+            "giao",
+            people,
+            orderPayload.g
+         );
+
+
+         // -----------------------------------------
+         // SO KIEN
+         // -----------------------------------------
+
+         document.getElementById(
+            "so_kien"
+         ).value =
+            Number(orderPayload.k) || 0;
+
+
+         updateCount();
+
+
+      } catch (error) {
+
+         showError(
+            error.message
+         );
+
+      }
    }
 
 
-   if (orderPayload) {
-      loadForm();
-   }
+   init();
 
 </script>
 
