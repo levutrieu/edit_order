@@ -1,588 +1,475 @@
 <!doctype html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Order Editor</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+      :root {
+        --bg: var(--tg-theme-bg-color, #f4f6f8);
+        --card: var(--tg-theme-secondary-bg-color, #ffffff);
+        --text: var(--tg-theme-text-color, #222222);
+        --hint: var(--tg-theme-hint-color, #777777);
+        --button: var(--tg-theme-button-color, #2481cc);
+        --button-text: var(--tg-theme-button-text-color, #ffffff);
+        --border: #e2e5e9;
+        --selected: #e8f3ff;
+      }
 
-        <script src="https://telegram.org/js/telegram-web-app.js"></script>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      }
 
-        <title>Order Editor</title>
+      body {
+        padding: 10px;
+        padding-bottom: 70px;
+      }
 
-        <style>
-            * {
-                box-sizing: border-box;
-            }
+      .container {
+        width: 100%;
+        max-width: 520px;
+        margin: auto;
+      }
 
-            :root {
-                --bg: var(--tg-theme-bg-color, #f4f6f8);
-                --card: var(--tg-theme-secondary-bg-color, #ffffff);
-                --text: var(--tg-theme-text-color, #222222);
-                --hint: var(--tg-theme-hint-color, #777777);
-                --button: var(--tg-theme-button-color, #2481cc);
-                --button-text: var(--tg-theme-button-text-color, #ffffff);
-                --border: #e2e5e9;
-                --selected: #e8f3ff;
-            }
-
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                background: var(--bg);
-                color: var(--text);
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            }
-
-            body {
-                padding: 10px;
-                padding-bottom: 70px;
-            }
-
-            .container {
-                width: 100%;
-                max-width: 520px;
-                margin: auto;
-            }
-
-            /* =========================================
+      /* =========================================
          HEADER
          ========================================= */
+      .header {
+        margin-bottom: 10px;
+      }
 
-            .header {
-                margin-bottom: 10px;
-            }
+      .title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+      }
 
-            .title {
-                font-size: 20px;
-                font-weight: 700;
-                margin: 0;
-            }
+      .order-info {
+        margin-top: 3px;
+        color: var(--hint);
+        font-size: 12px;
+      }
 
-            .order-info {
-                margin-top: 3px;
-                color: var(--hint);
-                font-size: 12px;
-            }
-
-            /* =========================================
+      /* =========================================
          SECTION
          ========================================= */
+      .section {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      }
 
-            .section {
-                background: var(--card);
-                border-radius: 12px;
-                padding: 10px;
-                margin-bottom: 8px;
-                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-            }
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 7px;
+      }
 
-            .section-title {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 7px;
-            }
+      .section-title-left {
+        font-size: 14px;
+        font-weight: 700;
+      }
 
-            .section-title-left {
-                font-size: 14px;
-                font-weight: 700;
-            }
+      .count {
+        font-size: 11px;
+        color: var(--hint);
+      }
 
-            .count {
-                font-size: 11px;
-                color: var(--hint);
-            }
-
-            /* =========================================
+      /* =========================================
          PEOPLE MULTISELECT
          ========================================= */
+      .people-box {
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--card);
+      }
 
-            .people-box {
-                position: relative;
-                border: 1px solid var(--border);
-                border-radius: 9px;
-                background: var(--card);
-            }
+      .multi-select {
+        position: relative;
+        width: 100%;
+      }
 
-            .multi-select {
-                position: relative;
-                width: 100%;
-            }
-
-            /* =========================================
+      /* =========================================
          COMBOBOX CONTROL
          ========================================= */
+      .multi-select-control {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 30px 4px 8px;
+        cursor: pointer;
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-            .multi-select-control {
-                min-height: 40px;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                padding: 4px 30px 4px 8px;
-                cursor: pointer;
-                position: relative;
-                -webkit-tap-highlight-color: transparent;
-            }
+      .multi-select-control::after {
+        content: "⌄";
+        position: absolute;
+        right: 9px;
+        top: 50%;
+        transform: translateY(-55%);
+        color: var(--hint);
+        font-size: 17px;
+        pointer-events: none;
+      }
 
-            .multi-select-control::after {
-                content: "⌄";
-                position: absolute;
-                right: 9px;
-                top: 50%;
-                transform: translateY(-55%);
-                color: var(--hint);
-                font-size: 17px;
-                pointer-events: none;
-            }
+      .multi-select.open .multi-select-control::after {
+        content: "⌃";
+      }
 
-            .multi-select.open .multi-select-control::after {
-                content: "⌃";
-            }
-
-            /* =========================================
+      /* =========================================
          SELECTED CHIPS
          ========================================= */
+      .selected-chips {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 3px;
+        min-width: 0;
+        flex: 1;
+      }
 
-            .selected-chips {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 3px;
-                min-width: 0;
-                flex: 1;
-            }
+      .selected-chips:empty::before {
+        content: "Chọn người...";
+        color: var(--hint);
+        font-size: 13px;
+      }
 
-            .selected-chips:empty::before {
-                content: "Chọn người...";
-                color: var(--hint);
-                font-size: 13px;
-            }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        max-width: 100%;
+        padding: 3px 6px;
+        border-radius: 6px;
+        background: var(--selected);
+        color: var(--button);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 17px;
+      }
 
-            .chip {
-                display: inline-flex;
-                align-items: center;
-                gap: 2px;
-                max-width: 100%;
-                padding: 3px 6px;
-                border-radius: 6px;
-                background: var(--selected);
-                color: var(--button);
-                font-size: 12px;
-                font-weight: 600;
-                line-height: 17px;
-            }
+      .chip span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
+      }
 
-            .chip span {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 160px;
-            }
+      .chip-remove {
+        width: 17px;
+        height: 17px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        padding: 0;
+        margin: 0;
+        font-size: 15px;
+        line-height: 15px;
+        cursor: pointer;
+        flex: 0 0 17px;
+      }
 
-            .chip-remove {
-                width: 17px;
-                height: 17px;
-                border: 0;
-                background: transparent;
-                color: inherit;
-                padding: 0;
-                margin: 0;
-                font-size: 15px;
-                line-height: 15px;
-                cursor: pointer;
-                flex: 0 0 17px;
-            }
-
-            /* =========================================
+      /* =========================================
          DROPDOWN
          ========================================= */
+      .people-dropdown {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+        left: 0;
+        right: 0;
+        top: calc(100% + 4px);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+        overflow: hidden;
+      }
 
-            .people-dropdown {
-                display: none;
+      .multi-select.open .people-dropdown {
+        display: block;
+      }
 
-                position: absolute;
-
-                z-index: 1000;
-
-                left: 0;
-                right: 0;
-
-                top: calc(100% + 4px);
-
-                background: var(--card);
-
-                border: 1px solid var(--border);
-
-                border-radius: 9px;
-
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
-
-                overflow: hidden;
-            }
-
-            .multi-select.open .people-dropdown {
-                display: block;
-            }
-
-            /* =========================================
+      /* =========================================
          SEARCH
          ========================================= */
+      .search-box {
+        position: relative;
+        border-bottom: 1px solid var(--border);
+        background: var(--card);
+      }
 
-            .search-box {
-                position: relative;
-                border-bottom: 1px solid var(--border);
-                background: var(--card);
-            }
+      .search-box input {
+        width: 100%;
+        height: 38px;
+        border: 0;
+        outline: 0;
+        padding: 7px 9px 7px 32px;
+        background: transparent;
+        color: var(--text);
+        font-size: 14px;
+      }
 
-            .search-box input {
-                width: 100%;
-                height: 38px;
-                border: 0;
-                outline: 0;
-                padding: 7px 9px 7px 32px;
-                background: transparent;
-                color: var(--text);
-                font-size: 14px;
-            }
+      .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--hint);
+        font-size: 15px;
+      }
 
-            .search-icon {
-                position: absolute;
-                left: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--hint);
-                font-size: 15px;
-            }
-
-            /* =========================================
+      /* =========================================
          PEOPLE LIST
          ========================================= */
+      .people-list {
+        max-height: 185px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
 
-            .people-list {
-                max-height: 185px;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
+      .person {
+        display: flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 5px 9px;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        -webkit-tap-highlight-color: transparent;
+      }
 
-            .person {
-                display: flex;
-                align-items: center;
+      .person:last-child {
+        border-bottom: 0;
+      }
 
-                min-height: 40px;
+      .person:active {
+        background: var(--selected);
+      }
 
-                padding: 5px 9px;
+      .person-info {
+        flex: 1;
+        min-width: 0;
+        margin-left: 8px;
+      }
 
-                cursor: pointer;
+      .person-name {
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-                border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      .person-id {
+        margin-top: 1px;
+        font-size: 10px;
+        color: var(--hint);
+      }
 
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            .person:last-child {
-                border-bottom: 0;
-            }
-
-            .person:active {
-                background: var(--selected);
-            }
-
-            .person-info {
-                flex: 1;
-                min-width: 0;
-                margin-left: 8px;
-            }
-
-            .person-name {
-                font-size: 13px;
-                font-weight: 500;
-
-                white-space: nowrap;
-
-                overflow: hidden;
-
-                text-overflow: ellipsis;
-            }
-
-            .person-id {
-                margin-top: 1px;
-                font-size: 10px;
-                color: var(--hint);
-            }
-
-            /* =========================================
+      /* =========================================
          CHECKBOX
          ========================================= */
+      .checkbox {
+        width: 19px;
+        height: 19px;
+        flex: 0 0 19px;
+        border: 2px solid #c8cdd3;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.15s;
+      }
 
-            .checkbox {
-                width: 19px;
-                height: 19px;
+      .person.selected .checkbox {
+        background: var(--button);
+        border-color: var(--button);
+      }
 
-                flex: 0 0 19px;
+      .person.selected .checkbox::after {
+        content: "✓";
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+      }
 
-                border: 2px solid #c8cdd3;
+      .empty {
+        padding: 14px;
+        text-align: center;
+        color: var(--hint);
+        font-size: 12px;
+      }
 
-                border-radius: 5px;
-
-                display: flex;
-
-                align-items: center;
-
-                justify-content: center;
-
-                transition: 0.15s;
-            }
-
-            .person.selected .checkbox {
-                background: var(--button);
-                border-color: var(--button);
-            }
-
-            .person.selected .checkbox::after {
-                content: "✓";
-
-                color: white;
-
-                font-size: 12px;
-
-                font-weight: 700;
-            }
-
-            .empty {
-                padding: 14px;
-
-                text-align: center;
-
-                color: var(--hint);
-
-                font-size: 12px;
-            }
-
-            /* =========================================
+      /* =========================================
          NUMBER INPUT
          ========================================= */
+      .number-input {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
 
-            .number-input {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
+      .number-input button {
+        width: 40px;
+        height: 40px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 21px;
+        cursor: pointer;
+      }
 
-            .number-input button {
-                width: 40px;
-                height: 40px;
+      .number-input input {
+        flex: 1;
+        min-width: 0;
+        height: 40px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+        background: transparent;
+        color: var(--text);
+        outline: none;
+      }
 
-                border: 0;
-
-                border-radius: 9px;
-
-                background: var(--bg);
-
-                color: var(--text);
-
-                font-size: 21px;
-
-                cursor: pointer;
-            }
-
-            .number-input input {
-                flex: 1;
-
-                min-width: 0;
-
-                height: 40px;
-
-                border: 1px solid var(--border);
-
-                border-radius: 9px;
-
-                text-align: center;
-
-                font-size: 17px;
-
-                font-weight: 600;
-
-                background: transparent;
-
-                color: var(--text);
-
-                outline: none;
-            }
-
-            /* =========================================
+      /* =========================================
          BUTTON
          ========================================= */
+      .submit-button {
+        width: 100%;
+        height: 44px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--button);
+        color: var(--button-text);
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+      }
 
-            .submit-button {
-                width: 100%;
+      .submit-button:active {
+        opacity: 0.8;
+      }
 
-                height: 44px;
+      .submit-button:disabled {
+        opacity: 0.5;
+      }
 
-                border: 0;
-
-                border-radius: 10px;
-
-                background: var(--button);
-
-                color: var(--button-text);
-
-                font-size: 15px;
-
-                font-weight: 700;
-
-                cursor: pointer;
-            }
-
-            .submit-button:active {
-                opacity: 0.8;
-            }
-
-            .submit-button:disabled {
-                opacity: 0.5;
-            }
-
-            /* =========================================
+      /* =========================================
          ERROR
          ========================================= */
+      #error {
+        display: none;
+        margin-top: 8px;
+        padding: 9px;
+        border-radius: 8px;
+        background: #fee4e2;
+        color: #b42318;
+        font-size: 12px;
+      }
 
-            #error {
-                display: none;
-
-                margin-top: 8px;
-
-                padding: 9px;
-
-                border-radius: 8px;
-
-                background: #fee4e2;
-
-                color: #b42318;
-
-                font-size: 12px;
-            }
-
-            /* =========================================
+      /* =========================================
          LOADING
          ========================================= */
-
-            .loading {
-                text-align: center;
-
-                padding: 30px;
-
-                color: var(--hint);
-            }
-        </style>
-    </head>
-
-    <body>
-        <div class="container">
-            <!-- =========================================
+      .loading {
+        text-align: center;
+        padding: 30px;
+        color: var(--hint);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- =========================================
         HEADER
         ========================================= -->
-
-            <div class="header">
-                <h1 class="title">
-                    ✏️ Chỉnh sửa đơn hàng: <strong id="orderCode">...</strong> (<i id="orderId">...</i>)
-                </h1>
-            </div>
-
-            <!-- =========================================
+      <div class="header">
+        <h1 class="title"> ✏️ Chỉnh sửa đơn hàng: <strong id="orderCode">...</strong> ( <i id="orderId">...</i>) </h1>
+      </div>
+      <!-- =========================================
         NGƯỜI SOẠN
         ========================================= -->
-
-            <div class="section">
-                <div class="section-title">
-                    <div class="section-title-left">📝 Người soạn</div>
-
-                    <div class="count" id="soanCount">0 người</div>
-                </div>
-
-                <div class="people-box" id="soanBox"></div>
-            </div>
-
-            <!-- =========================================
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left">📝 Người soạn</div>
+          <div class="count" id="soanCount">0 người</div>
+        </div>
+        <div class="people-box" id="soanBox"></div>
+      </div>
+      <!-- =========================================
         NGƯỜI ĐÓNG
         ========================================= -->
-
-            <div class="section">
-                <div class="section-title">
-                    <div class="section-title-left">📦 Người đóng</div>
-
-                    <div class="count" id="dongCount">0 người</div>
-                </div>
-
-                <div class="people-box" id="dongBox"></div>
-            </div>
-
-            <!-- =========================================
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left">📦 Người đóng</div>
+          <div class="count" id="dongCount">0 người</div>
+        </div>
+        <div class="people-box" id="dongBox"></div>
+      </div>
+      <!-- =========================================
         NGƯỜI GIAO
         ========================================= -->
-
-            <div class="section">
-                <div class="section-title">
-                    <div class="section-title-left">🚚 Người giao</div>
-
-                    <div class="count" id="giaoCount">0 người</div>
-                </div>
-
-                <div class="people-box" id="giaoBox"></div>
-            </div>
-
-            <!-- =========================================
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left">🚚 Người giao</div>
+          <div class="count" id="giaoCount">0 người</div>
+        </div>
+        <div class="people-box" id="giaoBox"></div>
+      </div>
+      <!-- =========================================
         SỐ KIỆN
         ========================================= -->
-
-            <div class="section">
-                <div class="section-title">
-                    <div class="section-title-left">📦 Số kiện</div>
-                </div>
-
-                <div class="number-input">
-                    <button type="button" onclick="changeQuantity(-1)">−</button>
-
-                    <input id="so_kien" type="number" min="0" step="1" value="0" />
-
-                    <button type="button" onclick="changeQuantity(1)">+</button>
-                </div>
-            </div>
-
-            <!-- =========================================
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left">📦 Số kiện</div>
+        </div>
+        <div class="number-input">
+          <button type="button" onclick="changeQuantity(-1)">−</button>
+          <input id="so_kien" type="number" min="0" step="1" value="0" />
+          <button type="button" onclick="changeQuantity(1)">+</button>
+        </div>
+      </div>
+      <!-- =========================================
         SUBMIT
         ========================================= -->
-
-            <button id="submitButton" class="submit-button" type="button" onclick="submitForm()">
-                CẬP NHẬT THÔNG TIN
-            </button>
-
-            <div id="error"></div>
-        </div>
-
-        <script>
-            // =====================================================
-            // TELEGRAM
-            // =====================================================
-
-            const tg = window.Telegram.WebApp;
-
-            tg.ready();
-
-            tg.expand();
-
-            // Cho Telegram biết màu header
-
-            if (tg.setHeaderColor) {
-                tg.setHeaderColor(tg.themeParams.bg_color || "#f4f6f8");
-            }
-
-            // =====================================================
-            // GLOBAL DATA
-            // =====================================================
-
-            let orderPayload = null;
-
-            /*
+      <button id="submitButton" class="submit-button" type="button" onclick="submitForm()"> CẬP NHẬT THÔNG TIN </button>
+      <div id="error"></div>
+    </div>
+    
+    <script>
+      // =====================================================
+      // TELEGRAM
+      // =====================================================
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      // Cho Telegram biết màu header
+      if (tg.setHeaderColor) {
+        tg.setHeaderColor(tg.themeParams.bg_color || "#f4f6f8");
+      }
+      // =====================================================
+      // GLOBAL DATA
+      // =====================================================
+      let orderPayload = null;
+      /*
       selections:
 
       {
@@ -591,807 +478,424 @@
          giao: Set([2,15,20])
       }
    */
+      const selections = {
+        dong: new Set(),
+        soan: new Set(),
+        giao: new Set(),
+      };
+      // =====================================================
+      // ERROR
+      // =====================================================
+      function showError(message) {
+        const el = document.getElementById("error");
+        el.textContent = message;
+        el.style.display = "block";
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }
 
-            const selections = {
-                dong: new Set(),
-
-                soan: new Set(),
-
-                giao: new Set(),
-            };
-
-            // =====================================================
-            // ERROR
-            // =====================================================
-
-            function showError(message) {
-                const el = document.getElementById("error");
-
-                el.textContent = message;
-
-                el.style.display = "block";
-
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-
-                    behavior: "smooth",
-                });
+      function clearError() {
+        const el = document.getElementById("error");
+        el.textContent = "";
+        el.style.display = "none";
+      }
+      // =====================================================
+      // BASE64URL DECODE
+      // =====================================================
+      function decodeBase64Url(str) {
+        str = String(str).replace(/-/g, "+").replace(/_/g, "/");
+        while (str.length % 4 !== 0) {
+          str += "=";
+        }
+        const binary = atob(str);
+        const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+        return new TextDecoder("utf-8").decode(bytes);
+      }
+      // =====================================================
+      // GET PAYLOAD
+      // =====================================================
+      function getPayload() {
+        const startapp = tg.initDataUnsafe?.start_param;
+        console.log("Telegram startapp:", startapp);
+        // =========================================
+        // TEST MODE
+        // =========================================
+        if (!startapp) {
+          console.warn("Không có startapp → TEST MODE");
+          return {
+            id: -1,
+            code: "N/A",
+            p: [],
+            s: [],
+            d: [],
+            g: [],
+            k: 0,
+            bot: ""
+          };
+        }
+        // =========================================
+        // DECODE
+        // =========================================
+        try {
+          const json = decodeBase64Url(startapp);
+          console.log("Decoded:", json);
+          const payload = JSON.parse(json);
+          console.log("Payload:", payload);
+          return payload;
+        } catch (error) {
+          console.error(error);
+          throw new Error("Không đọc được dữ liệu startapp.");
+        }
+      }
+      // =====================================================
+      // CREATE PEOPLE MULTISELECT COMBOBOX
+      // =====================================================
+      function createPeopleSelector(boxId, type, people, selectedIds) {
+        const box = document.getElementById(boxId);
+        box.innerHTML = "";
+        // =========================================
+        // INITIAL SELECTION
+        // =========================================
+        if (Array.isArray(selectedIds)) {
+          selectedIds.forEach((id) => {
+            selections[type].add(String(id));
+          });
+        }
+        // =========================================
+        // MULTI SELECT
+        // =========================================
+        const multiSelect = document.createElement("div");
+        multiSelect.className = "multi-select";
+        // =========================================
+        // CONTROL
+        // =========================================
+        const control = document.createElement("div");
+        control.className = "multi-select-control";
+        // =========================================
+        // CHIPS
+        // =========================================
+        const chips = document.createElement("div");
+        chips.className = "selected-chips";
+        chips.id = `${type}Chips`;
+        control.appendChild(chips);
+        // =========================================
+        // DROPDOWN
+        // =========================================
+        const dropdown = document.createElement("div");
+        dropdown.className = "people-dropdown";
+        // =========================================
+        // SEARCH
+        // =========================================
+        const searchBox = document.createElement("div");
+        searchBox.className = "search-box";
+        searchBox.innerHTML = `<span class="search-icon">⌕</span><input type="search" placeholder="Tìm tên..." autocomplete="off">`;
+        dropdown.appendChild(searchBox);
+        // =========================================
+        // PEOPLE LIST
+        // =========================================
+        const list = document.createElement("div");
+        list.className = "people-list";
+        list.id = `${type}List`;
+        dropdown.appendChild(list);
+        // =========================================
+        // BUILD
+        // =========================================
+        multiSelect.appendChild(control);
+        multiSelect.appendChild(dropdown);
+        box.appendChild(multiSelect);
+        // =========================================
+        // RENDER PEOPLE
+        // =========================================
+        function renderPeople(filter = "") {
+          list.innerHTML = "";
+          const keyword = filter.trim().toLowerCase();
+          const filtered = people.filter((person) => {
+            if (!keyword) {
+              return true;
             }
-
-            function clearError() {
-                const el = document.getElementById("error");
-
-                el.textContent = "";
-
-                el.style.display = "none";
-            }
-
-            // =====================================================
-            // BASE64URL DECODE
-            // =====================================================
-
-            function decodeBase64Url(str) {
-                str = String(str).replace(/-/g, "+").replace(/_/g, "/");
-
-                while (str.length % 4 !== 0) {
-                    str += "=";
-                }
-
-                const binary = atob(str);
-
-                const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-
-                return new TextDecoder("utf-8").decode(bytes);
-            }
-
-            // =====================================================
-            // GET PAYLOAD
-            // =====================================================
-
-            function getPayload() {
-                const startapp = tg.initDataUnsafe?.start_param;
-
-                console.log("Telegram startapp:", startapp);
-
-                // =========================================
-                // TEST MODE
-                // =========================================
-
-                if (!startapp) {
-                    console.warn("Không có startapp → TEST MODE");
-
-                    return {
-                        id: -1,
-                        code: "N/A",
-                        p: [],
-                        s: [],
-                        d: [],
-                        g: [],
-                        k: 0,
-                        bot: ""
-                    };
-                }
-
-                // =========================================
-                // DECODE
-                // =========================================
-
-                try {
-                    const json = decodeBase64Url(startapp);
-
-                    console.log("Decoded:", json);
-
-                    const payload = JSON.parse(json);
-
-                    console.log("Payload:", payload);
-
-                    return payload;
-                } catch (error) {
-                    console.error(error);
-
-                    throw new Error("Không đọc được dữ liệu startapp.");
-                }
-            }
-
-            // =====================================================
-            // CREATE PEOPLE MULTISELECT COMBOBOX
-            // =====================================================
-
-            function createPeopleSelector(boxId, type, people, selectedIds) {
-                const box = document.getElementById(boxId);
-
-                box.innerHTML = "";
-
-                // =========================================
-                // INITIAL SELECTION
-                // =========================================
-
-                if (Array.isArray(selectedIds)) {
-                    selectedIds.forEach((id) => {
-                        selections[type].add(String(id));
-                    });
-                }
-
-                // =========================================
-                // MULTI SELECT
-                // =========================================
-
-                const multiSelect = document.createElement("div");
-
-                multiSelect.className = "multi-select";
-
-                // =========================================
-                // CONTROL
-                // =========================================
-
-                const control = document.createElement("div");
-
-                control.className = "multi-select-control";
-
-                // =========================================
-                // CHIPS
-                // =========================================
-
-                const chips = document.createElement("div");
-
-                chips.className = "selected-chips";
-
-                chips.id = `${type}Chips`;
-
-                control.appendChild(chips);
-
-                // =========================================
-                // DROPDOWN
-                // =========================================
-
-                const dropdown = document.createElement("div");
-
-                dropdown.className = "people-dropdown";
-
-                // =========================================
-                // SEARCH
-                // =========================================
-
-                const searchBox = document.createElement("div");
-
-                searchBox.className = "search-box";
-
-                searchBox.innerHTML = `
-
-         <span class="search-icon">
-            ⌕
-         </span>
-
-         <input
-            type="search"
-            placeholder="Tìm tên..."
-            autocomplete="off"
-         >
-
-      `;
-
-                dropdown.appendChild(searchBox);
-
-                // =========================================
-                // PEOPLE LIST
-                // =========================================
-
-                const list = document.createElement("div");
-
-                list.className = "people-list";
-
-                list.id = `${type}List`;
-
-                dropdown.appendChild(list);
-
-                // =========================================
-                // BUILD
-                // =========================================
-
-                multiSelect.appendChild(control);
-
-                multiSelect.appendChild(dropdown);
-
-                box.appendChild(multiSelect);
-
-                // =========================================
-                // RENDER PEOPLE
-                // =========================================
-
-                function renderPeople(filter = "") {
-                    list.innerHTML = "";
-
-                    const keyword = filter.trim().toLowerCase();
-
-                    const filtered = people.filter((person) => {
-                        if (!keyword) {
-                            return true;
-                        }
-
-                        return String(person.name).toLowerCase().includes(keyword);
-                    });
-
-                    if (!filtered.length) {
-                        list.innerHTML = `
-
-               <div class="empty">
-                  Không tìm thấy người phù hợp
-               </div>
-
-            `;
-
-                        return;
-                    }
-
-                    filtered.forEach((person) => {
-                        const id = String(person.id);
-
-                        const selected = selections[type].has(id);
-
-                        const row = document.createElement("div");
-
-                        row.className = "person" + (selected ? " selected" : "");
-
-                        row.dataset.id = id;
-
-                        row.innerHTML = `
-
-                  <div class="checkbox"></div>
-
-                  <div class="person-info">
-
-                     <div class="person-name">
-                        ${escapeHtml(person.name)}
-                     </div>
-
-                     <div class="person-id">
-                        ID:
-                        ${escapeHtml(id)}
-                     </div>
-
-                  </div>
-
-               `;
-
-                        row.addEventListener("click", (event) => {
-                            event.stopPropagation();
-
-                            togglePerson(type, person.id);
-
-                            renderPeople(searchBox.querySelector("input").value);
-
-                            renderChips();
-
-                            updateCount();
-                        });
-
-                        list.appendChild(row);
-                    });
-                }
-
-                // =========================================
-                // RENDER CHIPS
-                // =========================================
-
-                function renderChips() {
-                    chips.innerHTML = "";
-
-                    people.forEach((person) => {
-                        const id = String(person.id);
-
-                        if (!selections[type].has(id)) {
-                            return;
-                        }
-
-                        const chip = document.createElement("div");
-
-                        chip.className = "chip";
-
-                        chip.innerHTML = `
-
-                  <span>
-                     ${escapeHtml(person.name)}
-                  </span>
-
-                  <button
-                     type="button"
-                     class="chip-remove"
-                  >
-                     ×
-                  </button>
-
-               `;
-
-                        chip.querySelector(".chip-remove").addEventListener("click", (event) => {
-                            event.stopPropagation();
-
-                            selections[type].delete(id);
-
-                            renderPeople(searchBox.querySelector("input").value);
-
-                            renderChips();
-
-                            updateCount();
-                        });
-
-                        chips.appendChild(chip);
-                    });
-                }
-
-                // =========================================
-                // OPEN
-                // =========================================
-
-                function openDropdown() {
-                    multiSelect.classList.add("open");
-
-                    renderPeople(searchBox.querySelector("input").value);
-                }
-
-                // =========================================
-                // CLOSE
-                // =========================================
-
-                function closeDropdown() {
-                    multiSelect.classList.remove("open");
-
-                    searchBox.querySelector("input").value = "";
-
-                    renderPeople();
-                }
-
-                // =========================================
-                // CLICK CONTROL
-                // =========================================
-
-                control.addEventListener("click", (event) => {
-                    event.stopPropagation();
-
-                    if (multiSelect.classList.contains("open")) {
-                        closeDropdown();
-                    } else {
-                        openDropdown();
-                    }
-                });
-
-                // =========================================
-                // SEARCH
-                // =========================================
-
-                searchBox.querySelector("input").addEventListener("input", (event) => {
-                    renderPeople(event.target.value);
-                });
-
-                // Không cho click search đóng dropdown
-
-                searchBox.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                });
-
-                // =========================================
-                // FIRST RENDER
-                // =========================================
-
-                renderPeople();
-
-                renderChips();
-
-                updateCount();
-            }
-
-            // =====================================================
-            // TOGGLE PERSON
-            // =====================================================
-
-            function togglePerson(type, id) {
-                id = String(id);
-
-                if (selections[type].has(id)) {
-                    selections[type].delete(id);
-                } else {
-                    selections[type].add(id);
-                }
-            }
-
-            // =====================================================
-            // COUNT
-            // =====================================================
-
-            function updateCount() {
-                document.getElementById("dongCount").textContent = `${selections.dong.size} người`;
-
-                document.getElementById("soanCount").textContent = `${selections.soan.size} người`;
-
-                document.getElementById("giaoCount").textContent = `${selections.giao.size} người`;
-            }
-
-            // =====================================================
-            // HTML ESCAPE
-            // =====================================================
-
-            function escapeHtml(value) {
-                return String(value)
-                    .replace(/&/g, "&amp;")
-
-                    .replace(/</g, "&lt;")
-
-                    .replace(/>/g, "&gt;")
-
-                    .replace(/"/g, "&quot;")
-
-                    .replace(/'/g, "&#039;");
-            }
-
-            // =====================================================
-            // QUANTITY
-            // =====================================================
-
-            function changeQuantity(delta) {
-                const input = document.getElementById("so_kien");
-
-                let value = Number(input.value) || 0;
-
-                value += delta;
-
-                if (value < 0) {
-                    value = 0;
-                }
-
-                input.value = value;
-            }
-
-            // =====================================================
-            // GET SELECTED IDS
-            // =====================================================
-
-            function getSelectedIds(type) {
-                return Array.from(selections[type]).map((id) => Number(id));
-            }
-
-            // =====================================================
-            // CLICK OUTSIDE
-            // =====================================================
-
-            document.addEventListener("click", () => {
-                document.querySelectorAll(".multi-select.open").forEach((el) => {
-                    el.classList.remove("open");
-                });
+            return String(person.name).toLowerCase().includes(keyword);
+          });
+          if (!filtered.length) {
+            list.innerHTML = `<div class="empty">Không tìm thấy người phù hợp</div>`;
+            return;
+          }
+          filtered.forEach((person) => {
+            const id = String(person.id);
+            const selected = selections[type].has(id);
+            const row = document.createElement("div");
+            row.className = "person" + (selected ? " selected" : "");
+            row.dataset.id = id;
+            row.innerHTML = `
+              <div class="checkbox"></div>
+              <div class="person-info">
+                <div class="person-name">
+                  ${escapeHtml(person.name)}
+                </div>
+                <div class="person-id">
+                  ID: ${escapeHtml(id)}
+                </div>
+              </div>`;
+            row.addEventListener("click", (event) => {
+              event.stopPropagation();
+              togglePerson(type, person.id);
+              renderPeople(searchBox.querySelector("input").value);
+              renderChips();
+              updateCount();
             });
-
-            // =====================================================
-            // SUBMIT → TELEGRAM
-            // =====================================================
-
-            function submitForm_MiniApp() {
-                clearError();
-
-                const data = {
-                    // ID đơn
-                    id: orderPayload.id,
-
-                    // Người đóng
-                    d: getSelectedIds("dong"),
-
-                    // Người soạn
-                    s: getSelectedIds("soan"),
-
-                    // Người giao
-                    g: getSelectedIds("giao"),
-
-                    // Số kiện
-                    k: Number(document.getElementById("so_kien").value) || 0,
-                };
-
-                console.log("SEND TO TELEGRAM:", data);
-
-                // =========================================
-                // VALIDATE
-                // =========================================
-
-                if (!data.d.length) {
-                    showError("Vui lòng chọn ít nhất một người đóng.");
-
-                    return;
-                }
-
-                if (!data.s.length) {
-                    showError("Vui lòng chọn ít nhất một người soạn.");
-
-                    return;
-                }
-
-                if (!data.g.length) {
-                    showError("Vui lòng chọn ít nhất một người giao.");
-
-                    return;
-                }
-
-                // =========================================
-                // DISABLE BUTTON
-                // =========================================
-
-                const button = document.getElementById("submitButton");
-
-                button.disabled = true;
-
-                button.textContent = "Đang gửi...";
-
-                // =========================================
-                // SEND DATA TO TELEGRAM BOT
-                // =========================================
-
-                try {
-                    tg.sendData(JSON.stringify(data));
-
-                    console.log("Đã gửi dữ liệu về Telegram Bot");
-                } catch (error) {
-                    button.disabled = false;
-
-                    button.textContent = "✓ LƯU ĐƠN HÀNG";
-
-                    showError("Không thể gửi dữ liệu về Telegram: " + error.message);
-                }
+            list.appendChild(row);
+          });
+        }
+        // =========================================
+        // RENDER CHIPS
+        // =========================================
+        function renderChips() {
+          chips.innerHTML = "";
+          people.forEach((person) => {
+            const id = String(person.id);
+            if (!selections[type].has(id)) {
+              return;
             }
-
-            async function submitForm() {
-
-                clearError();
-
-                const data = {
-
-                    // ID đơn
-                    id: orderPayload.id,
-
-                    // Người đóng
-                    d: getSelectedIds("dong"),
-
-                    // Người soạn
-                    s: getSelectedIds("soan"),
-
-                    // Người giao
-                    g: getSelectedIds("giao"),
-
-                    // Số kiện
-                    k:
-                        Number(
-                            document.getElementById("so_kien").value
-                        ) || 0
-                };
-
-
-                // =========================================
-                // VALIDATE
-                // =========================================
-
-                if (!data.d.length) {
-
-                    showError(
-                        "Vui lòng chọn ít nhất một người đóng."
-                    );
-
-                    return;
-                }
-
-
-                if (!data.s.length) {
-
-                    showError(
-                        "Vui lòng chọn ít nhất một người soạn."
-                    );
-
-                    return;
-                }
-
-
-                if (!data.g.length) {
-
-                    showError(
-                        "Vui lòng chọn ít nhất một người giao."
-                    );
-
-                    return;
-                }
-
-
-                // =========================================
-                // BUTTON
-                // =========================================
-
-                const button =
-                    document.getElementById(
-                        "submitButton"
-                    );
-
-                button.disabled = true;
-
-                button.textContent =
-                    "Đang lưu...";
-
-
-                // =========================================
-                // CALL N8N WEBHOOK
-                // =========================================
-
-                try {
-
-                    const response =
-                        await fetch(
-                            "https://n8n.n8n-self-host.cloud/webhook/54ae7ce2-2aba-409d-95f8-90b72b0a0056",
-                            {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify(data)
-                            }
-                        );
-
-
-                    // ======================================
-                    // CHECK HTTP STATUS
-                    // ======================================
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            `HTTP ${response.status}`
-                        );
-
-                    }
-
-
-                    // ======================================
-                    // READ RESPONSE
-                    // ======================================
-
-                    let result = null;
-
-                    try {
-
-                        result =
-                            await response.json();
-
-                    } catch (e) {
-
-                        // Webhook có thể trả text hoặc empty
-                        result = null;
-
-                    }
-
-
-                    console.log(
-                        "N8N RESPONSE:",
-                        result
-                    );
-
-
-                    // ======================================
-                    // SUCCESS
-                    // ======================================
-
-                    button.textContent =
-                        "✓ Đã lưu";
-
-
-                    // Có thể đóng Mini App
-                    setTimeout(() => {
-
-                        if (tg.close) {
-                            tg.close();
-                        }
-
-                    }, 500);
-
-
-                } catch (error) {
-
-                    console.error(
-                        "N8N WEBHOOK ERROR:",
-                        error
-                    );
-
-
-                    button.disabled =
-                        false;
-
-                    button.textContent =
-                        "✓ LƯU ĐƠN HÀNG";
-
-
-                    showError(
-                        "Không thể lưu đơn hàng: " +
-                        error.message
-                    );
-
-                }
-                }
-            // =====================================================
-            // INIT
-            // =====================================================
-
-            function init() {
-                try {
-                    orderPayload = getPayload();
-
-                    if (!orderPayload) {
-                        return;
-                    }
-
-                    // =========================================
-                    // ORDER ID + ORDER CODE
-                    // =========================================
-
-                    document.getElementById("orderId").textContent = orderPayload.id;
-
-                    document.getElementById("orderCode").textContent = orderPayload.code;
-
-                    // =========================================
-                    // PEOPLE
-                    // =========================================
-
-                    const people = Array.isArray(orderPayload.p) ? orderPayload.p : [];
-
-                    // =========================================
-                    // NGƯỜI ĐÓNG
-                    // =========================================
-
-                    createPeopleSelector(
-                        "dongBox",
-
-                        "dong",
-
-                        people,
-
-                        orderPayload.d
-                    );
-
-                    // =========================================
-                    // NGƯỜI SOẠN
-                    // =========================================
-
-                    createPeopleSelector(
-                        "soanBox",
-
-                        "soan",
-
-                        people,
-
-                        orderPayload.s
-                    );
-
-                    // =========================================
-                    // NGƯỜI GIAO
-                    // =========================================
-
-                    createPeopleSelector(
-                        "giaoBox",
-
-                        "giao",
-
-                        people,
-
-                        orderPayload.g
-                    );
-
-                    // =========================================
-                    // SỐ KIỆN
-                    // =========================================
-
-                    document.getElementById("so_kien").value = Number(orderPayload.k) || 0;
-
-                    updateCount();
-                } catch (error) {
-                    showError(error.message);
-                }
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.innerHTML = `
+              <span>
+                ${escapeHtml(person.name)}
+              </span>
+              <button type="button" class="chip-remove">×</button>
+              `;
+            chip.querySelector(".chip-remove").addEventListener("click", (event) => {
+              event.stopPropagation();
+              selections[type].delete(id);
+              renderPeople(searchBox.querySelector("input").value);
+              renderChips();
+              updateCount();
+            });
+            chips.appendChild(chip);
+          });
+        }
+        // =========================================
+        // OPEN
+        // =========================================
+        function openDropdown() {
+          multiSelect.classList.add("open");
+          renderPeople(searchBox.querySelector("input").value);
+        }
+        // =========================================
+        // CLOSE
+        // =========================================
+        function closeDropdown() {
+          multiSelect.classList.remove("open");
+          searchBox.querySelector("input").value = "";
+          renderPeople();
+        }
+        // =========================================
+        // CLICK CONTROL
+        // =========================================
+        control.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (multiSelect.classList.contains("open")) {
+            closeDropdown();
+          } else {
+            openDropdown();
+          }
+        });
+        // =========================================
+        // SEARCH
+        // =========================================
+        searchBox.querySelector("input").addEventListener("input", (event) => {
+          renderPeople(event.target.value);
+        });
+        // Không cho click search đóng dropdown
+        searchBox.addEventListener("click", (event) => {
+          event.stopPropagation();
+        });
+        // =========================================
+        // FIRST RENDER
+        // =========================================
+        renderPeople();
+        renderChips();
+        updateCount();
+      }
+      // =====================================================
+      // TOGGLE PERSON
+      // =====================================================
+      function togglePerson(type, id) {
+        id = String(id);
+        if (selections[type].has(id)) {
+          selections[type].delete(id);
+        } else {
+          selections[type].add(id);
+        }
+      }
+      // =====================================================
+      // COUNT
+      // =====================================================
+      function updateCount() {
+        document.getElementById("dongCount").textContent = `${selections.dong.size} người`;
+        document.getElementById("soanCount").textContent = `${selections.soan.size} người`;
+        document.getElementById("giaoCount").textContent = `${selections.giao.size} người`;
+      }
+      // =====================================================
+      // HTML ESCAPE
+      // =====================================================
+      function escapeHtml(value) {
+        return String(value).replace(/&/g, "&amp;").replace(/ < /g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+        // =====================================================
+        // QUANTITY
+        // =====================================================
+        function changeQuantity(delta) {
+          const input = document.getElementById("so_kien");
+          let value = Number(input.value) || 0;
+          value += delta;
+          if (value < 0) {
+            value = 0;
+          }
+          input.value = value;
+        }
+        // =====================================================
+        // GET SELECTED IDS
+        // =====================================================
+        function getSelectedIds(type) {
+          return Array.from(selections[type]).map((id) => Number(id));
+        }
+        // =====================================================
+        // CLICK OUTSIDE
+        // =====================================================
+        document.addEventListener("click", () => {
+          document.querySelectorAll(".multi-select.open").forEach((el) => {
+            el.classList.remove("open");
+          });
+        });
+        // =====================================================
+        // SUBMIT → TELEGRAM
+        // =====================================================        
+        async function submitForm() {
+          clearError();
+          const data = {
+            // ID đơn
+            id: orderPayload.id,
+            // Người đóng
+            d: getSelectedIds("dong"),
+            // Người soạn
+            s: getSelectedIds("soan"),
+            // Người giao
+            g: getSelectedIds("giao"),
+            // Số kiện
+            k: Number(document.getElementById("so_kien").value) || 0,
+            key: orderPayload.key
+          };
+          // =========================================
+          // VALIDATE
+          // =========================================
+          if (!data.d.length) {
+            showError("Vui lòng chọn ít nhất một người đóng.");
+            return;
+          }
+          if (!data.s.length) {
+            showError("Vui lòng chọn ít nhất một người soạn.");
+            return;
+          }
+          if (!data.g.length) {
+            showError("Vui lòng chọn ít nhất một người giao.");
+            return;
+          }
+          // =========================================
+          // BUTTON
+          // =========================================
+          const button = document.getElementById("submitButton");
+          button.disabled = true;
+          button.textContent = "Đang lưu...";
+          // =========================================
+          // CALL N8N WEBHOOK
+          // =========================================
+          try {
+            const response = await fetch("https://n8n.n8n-self-host.cloud/webhook/54ae7ce2-2aba-409d-95f8-90b72b0a0056", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(data)
+            });
+            // ======================================
+            // CHECK HTTP STATUS
+            // ======================================
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
             }
-
-            // =====================================================
-            // START
-            // =====================================================
-
-            init();
-        </script>
-    </body>
+            // ======================================
+            // READ RESPONSE
+            // ======================================
+            let result = null;
+            try {
+              result = await response.json();
+            } catch (e) {
+              // Webhook có thể trả text hoặc empty
+              result = null;
+            }
+            console.log("N8N RESPONSE:", result);
+            // ======================================
+            // SUCCESS
+            // ======================================
+            button.textContent = "✓ Đã lưu";
+            // Có thể đóng Mini App
+            setTimeout(() => {
+              if (tg.close) {
+                tg.close();
+              }
+            }, 500);
+          } catch (error) {
+            console.error("N8N WEBHOOK ERROR:", error);
+            button.disabled = false;
+            button.textContent = "✓ LƯU ĐƠN HÀNG";
+            showError("Không thể lưu đơn hàng: " + error.message);
+          }
+        }
+        // =====================================================
+        // INIT
+        // =====================================================
+        function init() {
+          try {
+            orderPayload = getPayload();
+            if (!orderPayload) {
+              return;
+            }
+            // =========================================
+            // ORDER ID + ORDER CODE
+            // =========================================
+            document.getElementById("orderId").textContent = orderPayload.id;
+            document.getElementById("orderCode").textContent = orderPayload.code;
+            // =========================================
+            // PEOPLE
+            // =========================================
+            const people = Array.isArray(orderPayload.p) ? orderPayload.p : [];
+            // =========================================
+            // NGƯỜI ĐÓNG
+            // =========================================
+            createPeopleSelector("dongBox", "dong", people, orderPayload.d);
+            // =========================================
+            // NGƯỜI SOẠN
+            // =========================================
+            createPeopleSelector("soanBox", "soan", people, orderPayload.s);
+            // =========================================
+            // NGƯỜI GIAO
+            // =========================================
+            createPeopleSelector("giaoBox", "giao", people, orderPayload.g);
+            // =========================================
+            // SỐ KIỆN
+            // =========================================
+            document.getElementById("so_kien").value = Number(orderPayload.k) || 0;
+            updateCount();
+          } catch (error) {
+            showError(error.message);
+          }
+        }
+        // =====================================================
+        // START
+        // =====================================================
+        init();
+    </script>
+  </body>
 </html>
