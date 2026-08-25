@@ -1139,19 +1139,22 @@
 
                 const data = {
 
+                    // ID đơn
                     id: orderPayload.id,
 
+                    // Người đóng
                     d: getSelectedIds("dong"),
 
+                    // Người soạn
                     s: getSelectedIds("soan"),
 
+                    // Người giao
                     g: getSelectedIds("giao"),
 
+                    // Số kiện
                     k:
                         Number(
-                            document.getElementById(
-                            "so_kien"
-                            ).value
+                            document.getElementById("so_kien").value
                         ) || 0
                 };
 
@@ -1191,38 +1194,6 @@
 
 
                 // =========================================
-                // ENCODE PAYLOAD
-                // =========================================
-
-                const json =
-                    JSON.stringify(data);
-
-
-                const payload =
-                    btoa(
-                        unescape(
-                            encodeURIComponent(json)
-                        )
-                    )
-                    .replace(/\+/g, "-")
-                    .replace(/\//g, "_")
-                    .replace(/=+$/, "");
-
-
-                console.log(
-                    "Telegram payload:",
-                    data
-                );
-
-                // =========================================
-                // TELEGRAM BOT
-                // =========================================
-
-                const botUsername = orderPayload.bot;
-
-                const telegramUrl = `https://t.me/${botUsername}?start=${payload}`;
-
-                // =========================================
                 // BUTTON
                 // =========================================
 
@@ -1231,22 +1202,111 @@
                         "submitButton"
                     );
 
-
-                button.disabled =
-                    true;
+                button.disabled = true;
 
                 button.textContent =
                     "Đang lưu...";
 
 
                 // =========================================
-                // RETURN TO TELEGRAM
+                // CALL N8N WEBHOOK
                 // =========================================
 
-                tg.openTelegramLink(telegramUrl);
+                try {
 
-                //window.location.href = telegramUrl;
-            }
+                    const response =
+                        await fetch(
+                            "https://n8n.n8n-self-host.cloud/webhook/1e1a8dd5-78c3-4316-93c6-b030c8c772cd/webhook",
+                            {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify(data)
+                            }
+                        );
+
+
+                    // ======================================
+                    // CHECK HTTP STATUS
+                    // ======================================
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+
+                    }
+
+
+                    // ======================================
+                    // READ RESPONSE
+                    // ======================================
+
+                    let result = null;
+
+                    try {
+
+                        result =
+                            await response.json();
+
+                    } catch (e) {
+
+                        // Webhook có thể trả text hoặc empty
+                        result = null;
+
+                    }
+
+
+                    console.log(
+                        "N8N RESPONSE:",
+                        result
+                    );
+
+
+                    // ======================================
+                    // SUCCESS
+                    // ======================================
+
+                    button.textContent =
+                        "✓ Đã lưu";
+
+
+                    // Có thể đóng Mini App
+                    setTimeout(() => {
+
+                        if (tg.close) {
+                            tg.close();
+                        }
+
+                    }, 500);
+
+
+                } catch (error) {
+
+                    console.error(
+                        "N8N WEBHOOK ERROR:",
+                        error
+                    );
+
+
+                    button.disabled =
+                        false;
+
+                    button.textContent =
+                        "✓ LƯU ĐƠN HÀNG";
+
+
+                    showError(
+                        "Không thể lưu đơn hàng: " +
+                        error.message
+                    );
+
+                }
+                }
             // =====================================================
             // INIT
             // =====================================================
