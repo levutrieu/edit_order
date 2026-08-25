@@ -668,6 +668,7 @@
                         d: [],
                         g: [],
                         k: 0,
+                        bot: ""
                     };
                 }
 
@@ -1061,7 +1062,7 @@
             // SUBMIT → TELEGRAM
             // =====================================================
 
-            function submitForm() {
+            function submitForm_MiniApp() {
                 clearError();
 
                 const data = {
@@ -1132,6 +1133,119 @@
                 }
             }
 
+            async function submitForm() {
+
+                clearError();
+
+                const data = {
+
+                    id: orderPayload.id,
+
+                    d: getSelectedIds("dong"),
+
+                    s: getSelectedIds("soan"),
+
+                    g: getSelectedIds("giao"),
+
+                    k:
+                        Number(
+                            document.getElementById(
+                            "so_kien"
+                            ).value
+                        ) || 0
+                };
+
+
+                // =========================================
+                // VALIDATE
+                // =========================================
+
+                if (!data.d.length) {
+
+                    showError(
+                        "Vui lòng chọn ít nhất một người đóng."
+                    );
+
+                    return;
+                }
+
+
+                if (!data.s.length) {
+
+                    showError(
+                        "Vui lòng chọn ít nhất một người soạn."
+                    );
+
+                    return;
+                }
+
+
+                if (!data.g.length) {
+
+                    showError(
+                        "Vui lòng chọn ít nhất một người giao."
+                    );
+
+                    return;
+                }
+
+
+                // =========================================
+                // ENCODE PAYLOAD
+                // =========================================
+
+                const json =
+                    JSON.stringify(data);
+
+
+                const payload =
+                    btoa(
+                        unescape(
+                            encodeURIComponent(json)
+                        )
+                    )
+                    .replace(/\+/g, "-")
+                    .replace(/\//g, "_")
+                    .replace(/=+$/, "");
+
+
+                console.log(
+                    "Telegram payload:",
+                    data
+                );
+
+                // =========================================
+                // TELEGRAM BOT
+                // =========================================
+
+                const botUsername = orderPayload.bot;
+
+                const telegramUrl = `https://t.me/${botUsername}?start=${payload}`;
+
+                // =========================================
+                // BUTTON
+                // =========================================
+
+                const button =
+                    document.getElementById(
+                        "submitButton"
+                    );
+
+
+                button.disabled =
+                    true;
+
+                button.textContent =
+                    "Đang lưu...";
+
+
+                // =========================================
+                // RETURN TO TELEGRAM
+                // =========================================
+
+                window.location.href =
+                    telegramUrl;
+            }
             // =====================================================
             // INIT
             // =====================================================
