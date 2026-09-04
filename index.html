@@ -461,6 +461,9 @@
       const tg = window.Telegram.WebApp;
       tg.ready();
       tg.expand();
+      // Lấy user Telegram gọi App
+      const user = tg.initDataUnsafe?.user;
+      console.log(user);
       // Cho Telegram biết màu header
       if (tg.setHeaderColor) {
         tg.setHeaderColor(tg.themeParams.bg_color || "#f4f6f8");
