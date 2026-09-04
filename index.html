@@ -790,12 +790,10 @@
             // Key
             key: orderPayload.key,
             // Thông tin người đang thao tác trên Telegram
-            telegram_user: {
-                id: telegramUser.id || null,
-                first_name: telegramUser.first_name || null,
-                last_name: telegramUser.last_name || null,
-                username: telegramUser.username || null
-            }
+            telegram_user_id: telegramUser.id || null,
+            telegram_first_name: telegramUser.first_name || null,
+            telegram_last_name: telegramUser.last_name || null,
+            telegram_username: telegramUser.username || null
           };
           // =========================================
           // VALIDATE
