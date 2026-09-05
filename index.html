@@ -478,8 +478,7 @@
          HEADER
          ===================================================== -->
       <div class="header">
-        <h1 class="title"> ( <i id="orderId">...</i>) <strong id="orderCode">...</strong>
-        </h1>
+        <h1 class="title"> (<i id="orderId">...</i>) <strong id="orderCode">...</strong></h1>
       </div>
       <!-- =====================================================
          NGƯỜI SOẠN
@@ -533,7 +532,7 @@
       <!-- =====================================================
          SUBMIT
          ===================================================== -->
-      <button id="submitButton" class="submit-button" type="button" onclick="submitForm()"> CẬP NHẬT THÔNG TIN </button>
+      <button id="submitButton" class="submit-button" type="button" onclick="submitForm()">CẬP NHẬT THÔNG TIN</button>
       <!-- =====================================================
          ERROR
          ===================================================== -->
@@ -557,7 +556,6 @@
       let orderPayload = null;
       /*
         selections:
-
         {
           dong: Set(["2"]),
           soan: Set(["8", "18"]),
@@ -571,7 +569,6 @@
       };
       /*
         Tom Select instances
-
         {
           dong: TomSelect,
           soan: TomSelect,
@@ -714,7 +711,7 @@
             // Search
             searchField: ["text"],
             // Placeholder
-            placeholder: "Chọn người...",
+            placeholder: "Chọn nhân viên...",
             // Load sẵn
             preload: true,
             // Không giữ item tạo tạm
@@ -737,7 +734,7 @@
               // NO RESULT
               // =================================================
               no_results: function() {
-                return `<div class="no-results">Không tìm thấy người phù hợp</div>`;
+                return `<div class="no-results">Không tìm thấy nhân viên phù hợp</div>`;
               }
             },
             // =================================================
