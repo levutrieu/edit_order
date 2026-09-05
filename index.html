@@ -1,1860 +1,984 @@
-
 <!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
-  />
-
-  <!-- Telegram Mini App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tom Select -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css"
-  />
-
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-
-  <title>Order Editor</title>
-
-  <style>
-    /* =====================================================
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <!-- Telegram Mini App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Tom Select -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" />
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+    <title>Order Editor</title>
+    <style>
+      /* =====================================================
        BASE
        ===================================================== */
-
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg: var(--tg-theme-bg-color, #f4f6f8);
-      --card: var(--tg-theme-secondary-bg-color, #ffffff);
-      --text: var(--tg-theme-text-color, #222222);
-      --hint: var(--tg-theme-hint-color, #777777);
-
-      --button: var(--tg-theme-button-color, #2481cc);
-      --button-text: var(--tg-theme-button-text-color, #ffffff);
-
-      --border: rgba(128, 128, 128, 0.22);
-      --selected: rgba(36, 129, 204, 0.10);
-
-      --danger-bg: #fee4e2;
-      --danger-text: #b42318;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-
-      background: var(--bg);
-      color: var(--text);
-
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-    }
-
-    body {
-      padding: 10px;
-      padding-bottom: 70px;
-    }
-
-    button,
-    input,
-    select {
-      font-family: inherit;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    /* =====================================================
-       HEADER
-       ===================================================== */
-
-    .header {
-      margin-bottom: 10px;
-    }
-
-    .title {
-      margin: 0;
-
-      font-size: 20px;
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    .order-info {
-      margin-top: 4px;
-
-      color: var(--hint);
-      font-size: 12px;
-    }
-
-    /* =====================================================
-       SECTION
-       ===================================================== */
-
-    .section {
-      background: var(--card);
-
-      border-radius: 13px;
-
-      padding: 10px;
-
-      margin-bottom: 8px;
-
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 2px 8px rgba(0, 0, 0, 0.03);
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      margin-bottom: 7px;
-    }
-
-    .section-title-left {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .count {
-      color: var(--hint);
-      font-size: 11px;
-    }
-
-    /* =====================================================
-       PEOPLE BOX
-       ===================================================== */
-
-    .people-box {
-      width: 100%;
-      position: relative;
-    }
-
-    /* =====================================================
-       TOM SELECT
-       ===================================================== */
-
-    .ts-wrapper {
-      width: 100%;
-    }
-
-    .ts-control {
-      min-height: 44px !important;
-
-      padding: 5px 36px 5px 8px !important;
-
-      border: 1px solid var(--border) !important;
-      border-radius: 10px !important;
-
-      background: var(--card) !important;
-      color: var(--text) !important;
-
-      box-shadow: none !important;
-
-      font-size: 13px !important;
-
-      transition:
-        border-color 0.15s,
-        box-shadow 0.15s;
-    }
-
-    .ts-wrapper.focus .ts-control {
-      border-color: var(--button) !important;
-
-      box-shadow:
-        0 0 0 2px rgba(36, 129, 204, 0.10) !important;
-    }
-
-    /* Placeholder */
-
-    .ts-control input::placeholder {
-      color: var(--hint);
-    }
-
-    /* =====================================================
-       SELECTED CHIPS
-       ===================================================== */
-
-    .ts-control > .item {
-      display: inline-flex !important;
-      align-items: center;
-
-      max-width: calc(100% - 5px);
-
-      margin:
-        2px
-        3px
-        2px
-        0 !important;
-
-      padding:
-        4px
-        7px !important;
-
-      border-radius: 7px !important;
-
-      background: var(--selected) !important;
-      color: var(--button) !important;
-
-      font-size: 12px !important;
-      font-weight: 600 !important;
-
-      line-height: 17px !important;
-    }
-
-    .ts-control > .item .remove {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      width: 17px;
-      height: 17px;
-
-      margin-left: 4px !important;
-
-      border: 0 !important;
-
-      color: var(--button) !important;
-
-      font-size: 15px !important;
-      font-weight: 700;
-
-      text-decoration: none;
-
-      cursor: pointer;
-    }
-
-    /* =========================
-	   CUSTOM ARROW
-	   ========================= */
-
-	.ts-wrapper.multi .ts-control {
-	  padding-right: 44px !important;
-	  position: relative;
-	}
-
-	/* Chevron */
-	.ts-wrapper.multi .ts-control::after {
-	  content: "";
-	  position: absolute;
-	  right: 16px;
-	  top: 50%;
-	  width: 8px;
-	  height: 8px;
-	  border-right: 1.8px solid #64748b;
-	  border-bottom: 1.8px solid #64748b;
-	  transform: translateY(-65%) rotate(45deg);
-	  transition:
-		transform 0.2s ease,
-		border-color 0.2s ease;
-	  pointer-events: none;
-	}
-
-	/* Khi dropdown mở */
-	.ts-wrapper.multi.dropdown-active .ts-control::after {
-	  transform: translateY(-30%) rotate(225deg);
-	  border-color: #2563eb;
-	}
-
-	/* =========================================
-	FIX: Tom Select remove_button padding-right
-	========================================= */
-	
-	/* Không để remove_button ép padding-right quá lớn */
-	.ts-wrapper.plugin-remove_button:not(.rtl) .item {
-	padding-right: 8px !important;
-	}
-	
-	/* Nút X vẫn có khoảng cách đẹp */
-	.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
-	padding: 0 !important;
-	margin-left: 6px !important;
-	border-left: 0 !important;
-	}
-
-    /* =====================================================
-       DROPDOWN
-       ===================================================== */
-
-    .ts-dropdown {
-      margin-top: 4px !important;
-
-      border:
-        1px solid var(--border) !important;
-
-      border-radius: 11px !important;
-
-      background: var(--card) !important;
-
-      color: var(--text) !important;
-
-      box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.16) !important;
-
-      overflow: hidden !important;
-
-      z-index: 9999 !important;
-    }
-
-    /* Search */
-
-    .ts-dropdown .dropdown-input-wrap {
-      padding: 7px !important;
-
-      border-bottom:
-        1px solid var(--border) !important;
-
-      background: var(--card) !important;
-    }
-
-    .ts-dropdown .dropdown-input {
-      width: 100%;
-
-      height: 36px !important;
-
-      padding:
-        6px
-        10px !important;
-
-      border:
-        1px solid var(--border) !important;
-
-      border-radius: 8px !important;
-
-      outline: none !important;
-
-      background: var(--bg) !important;
-
-      color: var(--text) !important;
-
-      font-size: 16px !important;
-    }
-
-    .ts-dropdown .dropdown-input:focus {
-      border-color: var(--button) !important;
-    }
-
-    /* =====================================================
-       OPTIONS
-       ===================================================== */
-
-    .ts-dropdown .option {
-      position: relative;
-
-      min-height: 48px;
-
-      display: flex;
-      align-items: center;
-
-      padding:
-        7px
-        10px !important;
-
-      border-bottom:
-        1px solid rgba(128, 128, 128, 0.08);
-
-      color: var(--text) !important;
-
-      font-size: 13px !important;
-
-      cursor: pointer;
-    }
-
-    .ts-dropdown .option:last-child {
-      border-bottom: 0;
-    }
-
-    .ts-dropdown .option.active {
-      background: var(--selected) !important;
-
-      color: var(--text) !important;
-    }
-
-    .ts-dropdown .option.selected {
-      background: transparent !important;
-    }
-
-    /* Checkbox */
-
-    .ts-dropdown .option::before {
-      content: "□";
-
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      width: 22px;
-      min-width: 22px;
-
-      margin-right: 7px;
-
-      color: var(--hint);
-
-      font-size: 20px;
-
-      line-height: 1;
-    }
-
-    .ts-dropdown .option.selected::before {
-      content: "✓";
-
-      color: var(--button);
-
-      font-weight: 800;
-    }
-
-    /* =====================================================
-       PERSON OPTION
-       ===================================================== */
-
-    .person-option {
-      flex: 1;
-
-      min-width: 0;
-    }
-
-    .person-name {
-      overflow: hidden;
-
-      white-space: nowrap;
-
-      text-overflow: ellipsis;
-
-      font-size: 13px;
-
-      font-weight: 600;
-    }
-
-    .person-id {
-      margin-top: 2px;
-
-      color: var(--hint);
-
-      font-size: 10px;
-    }
-
-    /* =====================================================
-       NO RESULTS
-       ===================================================== */
-
-    .no-results {
-      padding: 16px;
-
-      text-align: center;
-
-      color: var(--hint);
-
-      font-size: 12px;
-    }
-
-    /* =====================================================
-       NUMBER INPUT
-       ===================================================== */
-
-    .number-input {
-      display: flex;
-
-      align-items: center;
-
-      gap: 6px;
-    }
-
-    .number-input button {
-      width: 40px;
-      height: 40px;
-
-      flex: 0 0 40px;
-
-      border: 0;
-
-      border-radius: 9px;
-
-      background: var(--bg);
-
-      color: var(--text);
-
-      font-size: 21px;
-
-      cursor: pointer;
-
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .number-input button:active {
-      opacity: 0.65;
-
-      transform: scale(0.97);
-    }
-
-    .number-input input {
-      flex: 1;
-
-      min-width: 0;
-
-      height: 40px;
-
-      border:
-        1px solid var(--border);
-
-      border-radius: 9px;
-
-      outline: none;
-
-      background: transparent;
-
-      color: var(--text);
-
-      text-align: center;
-
-      font-size: 17px;
-
-      font-weight: 600;
-    }
-
-    .number-input input:focus {
-      border-color: var(--button);
-    }
-
-    /* =====================================================
-       SUBMIT BUTTON
-       ===================================================== */
-
-    .submit-button {
-      width: 100%;
-
-      height: 44px;
-
-      border: 0;
-
-      border-radius: 10px;
-
-      background: var(--button);
-
-      color: var(--button-text);
-
-      font-size: 15px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition:
-        opacity 0.15s,
-        transform 0.1s;
-    }
-
-    .submit-button:active {
-      opacity: 0.8;
-
-      transform: scale(0.99);
-    }
-
-    .submit-button:disabled {
-      opacity: 0.5;
-
-      cursor: default;
-    }
-
-    /* =====================================================
-       ERROR
-       ===================================================== */
-
-    #error {
-      display: none;
-
-      margin-top: 8px;
-
-      padding: 9px 10px;
-
-      border-radius: 8px;
-
-      background: var(--danger-bg);
-
-      color: var(--danger-text);
-
-      font-size: 12px;
-
-      line-height: 1.4;
-    }
-
-    /* =====================================================
-       LOADING
-       ===================================================== */
-
-    .loading {
-      padding: 30px;
-
-      text-align: center;
-
-      color: var(--hint);
-
-      font-size: 13px;
-    }
-
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
-    @media (max-width: 400px) {
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: var(--tg-theme-bg-color, #f4f6f8);
+        --card: var(--tg-theme-secondary-bg-color, #ffffff);
+        --text: var(--tg-theme-text-color, #222222);
+        --hint: var(--tg-theme-hint-color, #777777);
+        --button: var(--tg-theme-button-color, #2481cc);
+        --button-text: var(--tg-theme-button-text-color, #ffffff);
+        --border: rgba(128, 128, 128, 0.22);
+        --selected: rgba(36, 129, 204, 0.10);
+        --danger-bg: #fee4e2;
+        --danger-text: #b42318;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+      }
 
       body {
-        padding: 8px;
+        padding: 10px;
+        padding-bottom: 70px;
+      }
+
+      button,
+      input,
+      select {
+        font-family: inherit;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      /* =====================================================
+       HEADER
+       ===================================================== */
+      .header {
+        margin-bottom: 10px;
       }
 
       .title {
-        font-size: 18px;
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 700;
       }
 
+      .order-info {
+        margin-top: 4px;
+        color: var(--hint);
+        font-size: 12px;
+      }
+
+      /* =====================================================
+       SECTION
+       ===================================================== */
       .section {
-        padding: 9px;
+        background: var(--card);
+        border-radius: 13px;
+        padding: 10px;
+        margin-bottom: 8px;
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 2px 8px rgba(0, 0, 0, 0.03);
       }
 
-    }
-  </style>
-</head>
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 7px;
+      }
 
-<body>
+      .section-title-left {
+        font-size: 14px;
+        font-weight: 700;
+      }
 
-  <div class="container">
+      .count {
+        color: var(--hint);
+        font-size: 11px;
+      }
 
-    <!-- =====================================================
+      /* =====================================================
+       PEOPLE BOX
+       ===================================================== */
+      .people-box {
+        width: 100%;
+        position: relative;
+      }
+
+      /* =====================================================
+       TOM SELECT
+       ===================================================== */
+      .ts-wrapper {
+        width: 100%;
+      }
+
+      .ts-control {
+        min-height: 44px !important;
+        padding: 5px 36px 5px 8px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        background: var(--card) !important;
+        color: var(--text) !important;
+        box-shadow: none !important;
+        font-size: 13px !important;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+
+      .ts-wrapper.focus .ts-control {
+        border-color: var(--button) !important;
+        box-shadow:
+          0 0 0 2px rgba(36, 129, 204, 0.10) !important;
+      }
+
+      /* Placeholder */
+      .ts-control input::placeholder {
+        color: var(--hint);
+      }
+
+      /* =====================================================
+       SELECTED CHIPS
+       ===================================================== */
+      .ts-control>.item {
+        display: inline-flex !important;
+        align-items: center;
+        max-width: calc(100% - 5px);
+        margin:
+          2px 3px 2px 0 !important;
+        padding:
+          4px 7px !important;
+        border-radius: 7px !important;
+        background: var(--selected) !important;
+        color: var(--button) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 17px !important;
+      }
+
+      .ts-control>.item .remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 17px;
+        height: 17px;
+        margin-left: 4px !important;
+        border: 0 !important;
+        color: var(--button) !important;
+        font-size: 15px !important;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      /* =========================
+	   CUSTOM ARROW
+	   ========================= */
+      .ts-wrapper.multi .ts-control {
+        padding-right: 44px !important;
+        position: relative;
+      }
+
+      /* Chevron */
+      .ts-wrapper.multi .ts-control::after {
+        content: "";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        border-right: 1.8px solid #64748b;
+        border-bottom: 1.8px solid #64748b;
+        transform: translateY(-65%) rotate(45deg);
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease;
+        pointer-events: none;
+      }
+
+      /* Khi dropdown mở */
+      .ts-wrapper.multi.dropdown-active .ts-control::after {
+        transform: translateY(-30%) rotate(225deg);
+        border-color: #2563eb;
+      }
+
+      /* =========================================
+	FIX: Tom Select remove_button padding-right
+	========================================= */
+      /* Không để remove_button ép padding-right quá lớn */
+      .ts-wrapper.plugin-remove_button:not(.rtl) .item {
+        padding-right: 8px !important;
+      }
+
+      /* Nút X vẫn có khoảng cách đẹp */
+      .ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
+        padding: 0 !important;
+        margin-left: 6px !important;
+        border-left: 0 !important;
+      }
+
+      /* =====================================================
+       DROPDOWN
+       ===================================================== */
+      .ts-dropdown {
+        margin-top: 4px !important;
+        border:
+          1px solid var(--border) !important;
+        border-radius: 11px !important;
+        background: var(--card) !important;
+        color: var(--text) !important;
+        box-shadow:
+          0 8px 25px rgba(0, 0, 0, 0.16) !important;
+        overflow: hidden !important;
+        z-index: 9999 !important;
+      }
+
+      /* Search */
+      .ts-dropdown .dropdown-input-wrap {
+        padding: 7px !important;
+        border-bottom:
+          1px solid var(--border) !important;
+        background: var(--card) !important;
+      }
+
+      .ts-dropdown .dropdown-input {
+        width: 100%;
+        height: 36px !important;
+        padding:
+          6px 10px !important;
+        border:
+          1px solid var(--border) !important;
+        border-radius: 8px !important;
+        outline: none !important;
+        background: var(--bg) !important;
+        color: var(--text) !important;
+        font-size: 16px !important;
+      }
+
+      .ts-dropdown .dropdown-input:focus {
+        border-color: var(--button) !important;
+      }
+
+      /* =====================================================
+       OPTIONS
+       ===================================================== */
+      .ts-dropdown .option {
+        position: relative;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        padding:
+          7px 10px !important;
+        border-bottom:
+          1px solid rgba(128, 128, 128, 0.08);
+        color: var(--text) !important;
+        font-size: 13px !important;
+        cursor: pointer;
+      }
+
+      .ts-dropdown .option:last-child {
+        border-bottom: 0;
+      }
+
+      .ts-dropdown .option.active {
+        background: var(--selected) !important;
+        color: var(--text) !important;
+      }
+
+      .ts-dropdown .option.selected {
+        background: transparent !important;
+      }
+
+      /* Checkbox */
+      .ts-dropdown .option::before {
+        content: "□";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        min-width: 22px;
+        margin-right: 7px;
+        color: var(--hint);
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .ts-dropdown .option.selected::before {
+        content: "✓";
+        color: var(--button);
+        font-weight: 800;
+      }
+
+      /* =====================================================
+       PERSON OPTION
+       ===================================================== */
+      .person-option {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .person-name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .person-id {
+        margin-top: 2px;
+        color: var(--hint);
+        font-size: 10px;
+      }
+
+      /* =====================================================
+       NO RESULTS
+       ===================================================== */
+      .no-results {
+        padding: 16px;
+        text-align: center;
+        color: var(--hint);
+        font-size: 12px;
+      }
+
+      /* =====================================================
+       NUMBER INPUT
+       ===================================================== */
+      .number-input {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .number-input button {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border: 0;
+        border-radius: 9px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 21px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .number-input button:active {
+        opacity: 0.65;
+        transform: scale(0.97);
+      }
+
+      .number-input input {
+        flex: 1;
+        min-width: 0;
+        height: 40px;
+        border:
+          1px solid var(--border);
+        border-radius: 9px;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .number-input input:focus {
+        border-color: var(--button);
+      }
+
+      /* =====================================================
+       SUBMIT BUTTON
+       ===================================================== */
+      .submit-button {
+        width: 100%;
+        height: 44px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--button);
+        color: var(--button-text);
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          opacity 0.15s,
+          transform 0.1s;
+      }
+
+      .submit-button:active {
+        opacity: 0.8;
+        transform: scale(0.99);
+      }
+
+      .submit-button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      /* =====================================================
+       ERROR
+       ===================================================== */
+      #error {
+        display: none;
+        margin-top: 8px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        background: var(--danger-bg);
+        color: var(--danger-text);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      /* =====================================================
+       LOADING
+       ===================================================== */
+      .loading {
+        padding: 30px;
+        text-align: center;
+        color: var(--hint);
+        font-size: 13px;
+      }
+
+      /* =====================================================
+       MOBILE
+       ===================================================== */
+      @media (max-width: 400px) {
+        body {
+          padding: 8px;
+        }
+
+        .title {
+          font-size: 18px;
+        }
+
+        .section {
+          padding: 9px;
+        }
+      }
+    </style>undefined
+  </head>undefined<body>
+    <div class="container">
+      <!-- =====================================================
          HEADER
          ===================================================== -->
-
-    <div class="header">
-
-      <h1 class="title">
-		(<i id="orderId">...</i>)
-        <strong id="orderCode">...</strong>        
-      </h1>
-
-    </div>
-
-
-    <!-- =====================================================
+      <div class="header">
+        <h1 class="title"> ( <i id="orderId">...</i>) <strong id="orderCode">...</strong>
+        </h1>
+      </div>
+      <!-- =====================================================
          NGƯỜI SOẠN
          ===================================================== -->
-
-    <div class="section">
-
-      <div class="section-title">
-
-        <div class="section-title-left">
-          🛒 Người soạn
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left"> 🛒 Người soạn </div>
+          <div class="count" id="soanCount"> 0 người </div>
         </div>
-
-        <div class="count" id="soanCount">
-          0 người
+        <div class="people-box">
+          <select id="soanSelect" multiple autocomplete="off"></select>
         </div>
-
       </div>
-
-      <div class="people-box">
-
-        <select
-          id="soanSelect"
-          multiple
-          autocomplete="off"
-        ></select>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
+      <!-- =====================================================
          NGƯỜI ĐÓNG
          ===================================================== -->
-
-    <div class="section">
-
-      <div class="section-title">
-
-        <div class="section-title-left">
-          🏷️ Người đóng
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left"> 🏷️ Người đóng </div>
+          <div class="count" id="dongCount"> 0 người </div>
         </div>
-
-        <div class="count" id="dongCount">
-          0 người
+        <div class="people-box">
+          <select id="dongSelect" multiple autocomplete="off"></select>
         </div>
-
       </div>
-
-      <div class="people-box">
-
-        <select
-          id="dongSelect"
-          multiple
-          autocomplete="off"
-        ></select>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
+      <!-- =====================================================
          NGƯỜI GIAO
          ===================================================== -->
-
-    <div class="section">
-
-      <div class="section-title">
-
-        <div class="section-title-left">
-          🚚 Người giao
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left"> 🚚 Người giao </div>
+          <div class="count" id="giaoCount"> 0 người </div>
         </div>
-
-        <div class="count" id="giaoCount">
-          0 người
+        <div class="people-box">
+          <select id="giaoSelect" multiple autocomplete="off"></select>
         </div>
-
       </div>
-
-      <div class="people-box">
-
-        <select
-          id="giaoSelect"
-          multiple
-          autocomplete="off"
-        ></select>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
+      <!-- =====================================================
          SỐ KIỆN
          ===================================================== -->
-
-    <div class="section">
-
-      <div class="section-title">
-
-        <div class="section-title-left">
-          📦 Số kiện
+      <div class="section">
+        <div class="section-title">
+          <div class="section-title-left"> 📦 Số kiện </div>
         </div>
-
+        <div class="number-input">
+          <button type="button" onclick="changeQuantity(-1)"> − </button>
+          <input id="so_kien" type="number" min="0" step="1" value="0" inputmode="numeric" />
+          <button type="button" onclick="changeQuantity(1)"> + </button>
+        </div>
       </div>
-
-      <div class="number-input">
-
-        <button
-          type="button"
-          onclick="changeQuantity(-1)"
-        >
-          −
-        </button>
-
-        <input
-          id="so_kien"
-          type="number"
-          min="0"
-          step="1"
-          value="0"
-          inputmode="numeric"
-        />
-
-        <button
-          type="button"
-          onclick="changeQuantity(1)"
-        >
-          +
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
+      <!-- =====================================================
          SUBMIT
          ===================================================== -->
-
-    <button
-      id="submitButton"
-      class="submit-button"
-      type="button"
-      onclick="submitForm()"
-    >
-      CẬP NHẬT THÔNG TIN
-    </button>
-
-
-    <!-- =====================================================
+      <button id="submitButton" class="submit-button" type="button" onclick="submitForm()"> CẬP NHẬT THÔNG TIN </button>
+      <!-- =====================================================
          ERROR
          ===================================================== -->
-
-    <div id="error"></div>
-
-  </div>
-
-
-  <script>
-
-    // =====================================================
-    // TELEGRAM
-    // =====================================================
-
-    const tg = window.Telegram.WebApp;
-
-    tg.ready();
-    tg.expand();
-
-    const telegramUser =
-      tg.initDataUnsafe?.user || null;
-
-    // Telegram header color
-
-    if (tg.setHeaderColor) {
-
-      tg.setHeaderColor(
-        tg.themeParams?.bg_color || "#f4f6f8"
-      );
-
-    }
-
-
-    // =====================================================
-    // GLOBAL DATA
-    // =====================================================
-
-    let orderPayload = null;
-
-    /*
-      selections:
-
-      {
-        dong: Set(["2"]),
-        soan: Set(["8", "18"]),
-        giao: Set(["2", "15", "20"])
-      }
-    */
-
-    const selections = {
-
-      dong: new Set(),
-
-      soan: new Set(),
-
-      giao: new Set()
-
-    };
-
-
-    /*
-      Tom Select instances
-
-      {
-        dong: TomSelect,
-        soan: TomSelect,
-        giao: TomSelect
-      }
-    */
-
-    const selectors = {};
-
-
-    // =====================================================
-    // ERROR
-    // =====================================================
-
-    function showError(message) {
-
-      const el =
-        document.getElementById("error");
-
-      el.textContent = message;
-
-      el.style.display = "block";
-
-      window.scrollTo({
-
-        top: document.body.scrollHeight,
-
-        behavior: "smooth"
-
-      });
-
-    }
-
-
-    function clearError() {
-
-      const el =
-        document.getElementById("error");
-
-      el.textContent = "";
-
-      el.style.display = "none";
-
-    }
-
-
-    // =====================================================
-    // BASE64URL DECODE
-    // =====================================================
-
-    function decodeBase64Url(str) {
-
-      str = String(str)
-        .replace(/-/g, "+")
-        .replace(/_/g, "/");
-
-      while (str.length % 4 !== 0) {
-
-        str += "=";
-
-      }
-
-      const binary = atob(str);
-
-      const bytes =
-        Uint8Array.from(
-          binary,
-          c => c.charCodeAt(0)
-        );
-
-      return new TextDecoder("utf-8")
-        .decode(bytes);
-
-    }
-
-
-    // =====================================================
-    // GET PAYLOAD
-    // =====================================================
-
-    function getPayload() {
-
-      const startapp =
-        tg.initDataUnsafe?.start_param;
-
-      console.log(
-        "Telegram startapp:",
-        startapp
-      );
-
-
-      // ===================================================
-      // TEST MODE
-      // ===================================================
-
-      if (!startapp) {
-
-        console.warn(
-          "Không có startapp → TEST MODE"
-        );
-
-        return {
-
-          id: -1,
-
-          code: "N/A",
-
-          p: [],
-
-          s: [],
-
-          d: [],
-
-          g: [],
-
-          k: 0,
-
-          bot: "",
-
-          key: "",
-
-          webhook: ""
-
-        };
-
-      }
-
-
-      // ===================================================
-      // DECODE
-      // ===================================================
-
-      try {
-
-        const json =
-          decodeBase64Url(startapp);
-
-        console.log(
-          "Decoded:",
-          json
-        );
-
-        const payload =
-          JSON.parse(json);
-
-        console.log(
-          "Payload:",
-          payload
-        );
-
-        return payload;
-
-      } catch (error) {
-
-        console.error(error);
-
-        throw new Error(
-          "Không đọc được dữ liệu startapp."
-        );
-
-      }
-
-    }
-
-
-    // =====================================================
-    // HTML ESCAPE
-    // =====================================================
-
-    function escapeHtml(value) {
-
-      return String(value)
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
-
-    }
-
-
-    // =====================================================
-    // CREATE PEOPLE MULTISELECT
-    // =====================================================
-
-    function createPeopleSelector(
-      selectId,
-      type,
-      people,
-      selectedIds
-    ) {
-
-      const select =
-        document.getElementById(selectId);
-
-
-      if (!select) {
-
-        console.error(
-          "Không tìm thấy select:",
-          selectId
-        );
-
-        return;
-
-      }
-
-
-      // ===================================================
-      // CLEAR OLD OPTIONS
-      // ===================================================
-
-      select.innerHTML = "";
-
-
-      // ===================================================
-      // RESET SELECTION
-      // ===================================================
-
-      selections[type].clear();
-
-
-      // ===================================================
-      // OPTIONS
-      // ===================================================
-
-      people.forEach(person => {
-
-        const id =
-          String(person.id);
-
-        const option =
-          document.createElement("option");
-
-        option.value = id;
-
-        option.textContent =
-          person.name || id;
-
-        select.appendChild(option);
-
-      });
-
-
-      // ===================================================
-      // INITIAL SELECTION
-      // ===================================================
-
-      const initialValues =
-        Array.isArray(selectedIds)
-          ? selectedIds.map(id => String(id))
-          : [];
-
-
-      initialValues.forEach(id => {
-
-        selections[type].add(id);
-
-      });
-
-
-      // ===================================================
-      // DESTROY OLD INSTANCE
-      // ===================================================
-
-      if (selectors[type]) {
-
-        selectors[type].destroy();
-
-        delete selectors[type];
-
-      }
-
-
-      // ===================================================
-      // TOM SELECT
+      <div id="error"></div>
+    </div>
+    <script>
       // =====================================================
-
-      const ts =
-        new TomSelect(select, {
-
-          plugins: {
-
-            remove_button: {
-
-              title: "Xóa"
-
-            }
-
-          },
-
-
-          // Cho phép chọn nhiều
-          maxItems: null,
-
-
-          // Không đóng dropdown sau mỗi lần chọn
-          closeAfterSelect: false,
-
-
-          // Không ẩn option đã chọn
-          hideSelected: false,
-
-
-          // Không cho tạo người mới
-          create: false,
-
-
-          // Search
-          searchField: [
-            "text"
-          ],
-
-
-          // Placeholder
-          placeholder:
-            "Chọn người...",
-
-
-          // Load sẵn
-          preload: true,
-
-
-          // Không giữ item tạo tạm
-          persist: false,
-
-
-          // =================================================
-          // RENDER OPTION
-          // =================================================
-
-          render: {
-
-            option:
-              function(data, escape) {
-
-                const id =
-                  escape(data.value);
-
-                const name =
-                  escape(data.text);
-
-                return `
-
-                  <div class="person-option">
-
-                    <div class="person-name">
-                      ${name}
-                    </div>
-
-                    <div class="person-id">
-                      ID: ${id}
-                    </div>
-
-                  </div>
-
-                `;
-
-              },
-
-
-            // =================================================
-            // RENDER SELECTED ITEM
-            // =================================================
-
-            item:
-              function(data, escape) {
-
-                return `
-
-                  <div class="item">
-
-                    ${escape(data.text)}
-
-                  </div>
-
-                `;
-
-              },
-
-
-            // =================================================
-            // NO RESULT
-            // =================================================
-
-            no_results:
-              function() {
-
-                return `
-
-                  <div class="no-results">
-
-                    Không tìm thấy người phù hợp
-
-                  </div>
-
-                `;
-
-              }
-
-          },
-
-
-          // =================================================
-          // INITIALIZE
-          // =================================================
-
-          onInitialize:
-            function() {
-
-              if (initialValues.length) {
-
-                this.setValue(
-                  initialValues,
-                  true
-                );
-
-              }
-
-              updateCount();
-
-            },
-
-
-          // =================================================
-          // ADD
-          // =================================================
-
-          onItemAdd:
-            function(value) {
-
-              selections[type]
-                .add(String(value));
-
-              updateCount();
-
-            },
-
-
-          // =================================================
-          // REMOVE
-          // =================================================
-
-          onItemRemove:
-            function(value) {
-
-              selections[type]
-                .delete(String(value));
-
-              updateCount();
-
-            },
-
-
-          // =================================================
-          // OPEN
-          // =================================================
-
-          onDropdownOpen:
-            function() {
-
-              console.log(
-                "Open:",
-                type
-              );
-
-            }
-
-        });
-
-
-      selectors[type] = ts;
-
-
-      updateCount();
-
-    }
-
-
-    // =====================================================
-    // COUNT
-    // =====================================================
-
-    function updateCount() {
-
-      const dongCount =
-        document.getElementById("dongCount");
-
-      const soanCount =
-        document.getElementById("soanCount");
-
-      const giaoCount =
-        document.getElementById("giaoCount");
-
-
-      if (dongCount) {
-
-        dongCount.textContent =
-          `${selections.dong.size} người`;
-
+      // TELEGRAM
+      // =====================================================
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      const telegramUser = tg.initDataUnsafe?.user || null;
+      // Telegram header color
+      if (tg.setHeaderColor) {
+        tg.setHeaderColor(tg.themeParams?.bg_color || "#f4f6f8");
       }
+      // =====================================================
+      // GLOBAL DATA
+      // =====================================================
+      let orderPayload = null;
+      /*
+        selections:
 
-
-      if (soanCount) {
-
-        soanCount.textContent =
-          `${selections.soan.size} người`;
-
-      }
-
-
-      if (giaoCount) {
-
-        giaoCount.textContent =
-          `${selections.giao.size} người`;
-
-      }
-
-    }
-
-
-    // =====================================================
-    // QUANTITY
-    // =====================================================
-
-    function changeQuantity(delta) {
-
-      const input =
-        document.getElementById("so_kien");
-
-      let value =
-        Number(input.value) || 0;
-
-      value += delta;
-
-
-      if (value < 0) {
-
-        value = 0;
-
-      }
-
-
-      input.value = value;
-
-    }
-
-
-    // =====================================================
-    // GET SELECTED IDS
-    // =====================================================
-
-    function getSelectedIds(type) {
-
-      return Array
-        .from(selections[type])
-        .map(id => Number(id));
-
-    }
-
-
-    // =====================================================
-    // SUBMIT → TELEGRAM / N8N
-    // =====================================================
-
-    async function submitForm() {
-
-      clearError();
-
-
-      if (!orderPayload) {
-
-        showError(
-          "Không có dữ liệu đơn hàng."
-        );
-
-        return;
-
-      }
-
-
-      // ===================================================
-      // TELEGRAM USER
-      // ===================================================
-
-      const user =
-        telegramUser || {};
-
-
-      // ===================================================
-      // DATA
-      // ===================================================
-
-      const data = {
-
-        // ID đơn
-        id: orderPayload.id,
-
-
-        // Người đóng
-        d: getSelectedIds("dong"),
-
-
-        // Người soạn
-        s: getSelectedIds("soan"),
-
-
-        // Người giao
-        g: getSelectedIds("giao"),
-
-
-        // Số kiện
-        k:
-          Number(
-            document.getElementById("so_kien").value
-          ) || 0,
-
-
-        // Key
-        key:
-          orderPayload.key || null,
-
-
-        // Telegram user
-        telegram_user_id:
-          user.id || null,
-
-        telegram_first_name:
-          user.first_name || null,
-
-        telegram_last_name:
-          user.last_name || null,
-
-        telegram_username:
-          user.username || null
-
+        {
+          dong: Set(["2"]),
+          soan: Set(["8", "18"]),
+          giao: Set(["2", "15", "20"])
+        }
+      */
+      const selections = {
+        dong: new Set(),
+        soan: new Set(),
+        giao: new Set()
       };
+      /*
+        Tom Select instances
 
-
-      console.log(
-        "SUBMIT DATA:",
-        data
-      );
-
-
-      // ===================================================
-      // VALIDATE
-      // ===================================================
-
-      if (!data.d.length) {
-
-        showError(
-          "Vui lòng chọn ít nhất một người đóng."
-        );
-
-        return;
-
-      }
-
-
-      if (!data.s.length) {
-
-        showError(
-          "Vui lòng chọn ít nhất một người soạn."
-        );
-
-        return;
-
-      }
-
-
-      if (!data.g.length) {
-
-        showError(
-          "Vui lòng chọn ít nhất một người giao."
-        );
-
-        return;
-
-      }
-
-
-      // ===================================================
-      // BUTTON
-      // ===================================================
-
-      const button =
-        document.getElementById("submitButton");
-
-
-      button.disabled = true;
-
-      button.textContent =
-        "Đang lưu...";
-
-
-      // ===================================================
-      // WEBHOOK CHECK
-      // ===================================================
-
-      if (!orderPayload.webhook) {
-
-        button.disabled = false;
-
-        button.textContent =
-          "CẬP NHẬT THÔNG TIN";
-
-        showError(
-          "Không tìm thấy webhook."
-        );
-
-        return;
-
-      }
-
-
-      // ===================================================
-      // CALL N8N WEBHOOK
-      // ===================================================
-
-      try {
-
-        const response =
-          await fetch(
-            orderPayload.webhook,
-            {
-
-              method: "POST",
-
-              headers: {
-
-                "Content-Type":
-                  "application/json"
-
-              },
-
-              body:
-                JSON.stringify(data)
-
-            }
-          );
-
-
-        // =================================================
-        // HTTP STATUS
-        // =================================================
-
-        if (!response.ok) {
-
-          throw new Error(
-            `HTTP ${response.status}`
-          );
-
+        {
+          dong: TomSelect,
+          soan: TomSelect,
+          giao: TomSelect
         }
+      */
+      const selectors = {};
+      // =====================================================
+      // ERROR
+      // =====================================================
+      function showError(message) {
+        const el = document.getElementById("error");
+        el.textContent = message;
+        el.style.display = "block";
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth"
+        });
+      }
 
-
-        // =================================================
-        // RESPONSE
-        // =================================================
-
-        let result = null;
-
-
+      function clearError() {
+        const el = document.getElementById("error");
+        el.textContent = "";
+        el.style.display = "none";
+      }
+      // =====================================================
+      // BASE64URL DECODE
+      // =====================================================
+      function decodeBase64Url(str) {
+        str = String(str).replace(/-/g, "+").replace(/_/g, "/");
+        while (str.length % 4 !== 0) {
+          str += "=";
+        }
+        const binary = atob(str);
+        const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+        return new TextDecoder("utf-8").decode(bytes);
+      }
+      // =====================================================
+      // GET PAYLOAD
+      // =====================================================
+      function getPayload() {
+        const startapp = tg.initDataUnsafe?.start_param;
+        console.log("Telegram startapp:", startapp);
+        // ===================================================
+        // TEST MODE
+        // ===================================================
+        if (!startapp) {
+          console.warn("Không có startapp → TEST MODE");
+          return {
+            id: -1,
+            code: "N/A",
+            p: [],
+            s: [],
+            d: [],
+            g: [],
+            k: 0,
+            bot: "",
+            key: "",
+            webhook: ""
+          };
+        }
+        // ===================================================
+        // DECODE
+        // ===================================================
         try {
-
-          result =
-            await response.json();
-
-        } catch (e) {
-
-          result = null;
-
+          const json = decodeBase64Url(startapp);
+          console.log("Decoded:", json);
+          const payload = JSON.parse(json);
+          console.log("Payload:", payload);
+          return payload;
+        } catch (error) {
+          console.error(error);
+          throw new Error("Không đọc được dữ liệu startapp.");
         }
-
-
-        console.log(
-          "N8N RESPONSE:",
-          result
-        );
-
-
-        // =================================================
-        // SUCCESS
-        // =================================================
-
-        button.textContent =
-          "✓ Đã lưu";
-
-
-        // Telegram haptic
-        if (tg.HapticFeedback) {
-
-          tg.HapticFeedback.notificationOccurred(
-            "success"
-          );
-
+      }
+      // =====================================================
+      // HTML ESCAPE
+      // =====================================================
+      function escapeHtml(value) {
+        return String(value).replace(/&/g, "&amp;").replace(/ < /g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
-
-
-        // Close Mini App
-        setTimeout(() => {
-
-          if (tg.close) {
-
-            tg.close();
-
+        // =====================================================
+        // CREATE PEOPLE MULTISELECT
+        // =====================================================
+        function createPeopleSelector(selectId, type, people, selectedIds) {
+          const select = document.getElementById(selectId);
+          if (!select) {
+            console.error("Không tìm thấy select:", selectId);
+            return;
           }
-
-        }, 500);
-
-
-      } catch (error) {
-
-        console.error(
-          "N8N WEBHOOK ERROR:",
-          error
-        );
-
-
-        button.disabled = false;
-
-        button.textContent =
-          "CẬP NHẬT THÔNG TIN";
-
-
-        if (tg.HapticFeedback) {
-
-          tg.HapticFeedback.notificationOccurred(
-            "error"
-          );
-
+          // ===================================================
+          // CLEAR OLD OPTIONS
+          // ===================================================
+          select.innerHTML = "";
+          // ===================================================
+          // RESET SELECTION
+          // ===================================================
+          selections[type].clear();
+          // ===================================================
+          // OPTIONS
+          // ===================================================
+          people.forEach(person => {
+            const id = String(person.id);
+            const option = document.createElement("option");
+            option.value = id;
+            option.textContent = person.name || id;
+            select.appendChild(option);
+          });
+          // ===================================================
+          // INITIAL SELECTION
+          // ===================================================
+          const initialValues = Array.isArray(selectedIds) ? selectedIds.map(id => String(id)) : [];
+          initialValues.forEach(id => {
+            selections[type].add(id);
+          });
+          // ===================================================
+          // DESTROY OLD INSTANCE
+          // ===================================================
+          if (selectors[type]) {
+            selectors[type].destroy();
+            delete selectors[type];
+          }
+          // ===================================================
+          // TOM SELECT
+          // =====================================================
+          const ts = new TomSelect(select, {
+            plugins: {
+              remove_button: {
+                title: "Xóa"
+              }
+            },
+            // Cho phép chọn nhiều
+            maxItems: null,
+            // Không đóng dropdown sau mỗi lần chọn
+            closeAfterSelect: false,
+            // Không ẩn option đã chọn
+            hideSelected: false,
+            // Không cho tạo người mới
+            create: false,
+            // Search
+            searchField: ["text"],
+            // Placeholder
+            placeholder: "Chọn người...",
+            // Load sẵn
+            preload: true,
+            // Không giữ item tạo tạm
+            persist: false,
+            // =================================================
+            // RENDER OPTION
+            // =================================================
+            render: {
+              option: function(data, escape) {
+                const name = escape(data.text);
+                return `<div class="person-option"><div class="person-name">${name}</div></div>`;
+              },
+              // =================================================
+              // RENDER SELECTED ITEM
+              // =================================================
+              item: function(data, escape) {
+                return `<div class="item">${escape(data.text)}</div>`;
+              },
+              // =================================================
+              // NO RESULT
+              // =================================================
+              no_results: function() {
+                return `<div class="no-results">Không tìm thấy người phù hợp</div>`;
+              }
+            },
+            // =================================================
+            // INITIALIZE
+            // =================================================
+            onInitialize: function() {
+              if (initialValues.length) {
+                this.setValue(initialValues, true);
+              }
+              updateCount();
+            },
+            // =================================================
+            // ADD
+            // =================================================
+            onItemAdd: function(value) {
+              selections[type].add(String(value));
+              updateCount();
+            },
+            // =================================================
+            // REMOVE
+            // =================================================
+            onItemRemove: function(value) {
+              selections[type].delete(String(value));
+              updateCount();
+            },
+            // =================================================
+            // OPEN
+            // =================================================
+            onDropdownOpen: function() {
+              console.log("Open:", type);
+            }
+          });
+          selectors[type] = ts;
+          updateCount();
         }
-
-
-        showError(
-          "Không thể lưu đơn hàng: " +
-          error.message
-        );
-
-      }
-
-    }
-
-
-    // =====================================================
-    // INIT
-    // =====================================================
-
-    function init() {
-
-      try {
-
-        // ================================================
-        // GET PAYLOAD
-        // ================================================
-
-        orderPayload =
-          getPayload();
-
-
-        if (!orderPayload) {
-
-          showError(
-            "Không có dữ liệu đơn hàng."
-          );
-
-          return;
-
-        }
-
-
-        // ================================================
-        // ORDER ID
-        // ================================================
-
-        document
-          .getElementById("orderId")
-          .textContent =
-            orderPayload.id ?? "...";
-
-
-        // ================================================
-        // ORDER CODE
-        // ================================================
-
-        document
-          .getElementById("orderCode")
-          .textContent =
-            orderPayload.code ?? "...";
-
-
-        // ================================================
-        // PEOPLE
-        // ================================================
-
-        const people =
-          Array.isArray(orderPayload.p)
-            ? orderPayload.p
-            : [];
-
-
-        // ================================================
-        // NGƯỜI ĐÓNG
-        // ================================================
-
-        createPeopleSelector(
-          "dongSelect",
-          "dong",
-          people,
-          orderPayload.d
-        );
-
-
-        // ================================================
-        // NGƯỜI SOẠN
-        // ================================================
-
-        createPeopleSelector(
-          "soanSelect",
-          "soan",
-          people,
-          orderPayload.s
-        );
-
-
-        // ================================================
-        // NGƯỜI GIAO
-        // ================================================
-
-        createPeopleSelector(
-          "giaoSelect",
-          "giao",
-          people,
-          orderPayload.g
-        );
-
-
-        // ================================================
-        // SỐ KIỆN
-        // ================================================
-
-        document
-          .getElementById("so_kien")
-          .value =
-            Number(orderPayload.k) || 0;
-
-
-        // ================================================
+        // =====================================================
         // COUNT
-        // ================================================
-
-        updateCount();
-
-
-        console.log(
-          "Mini App initialized:",
-          orderPayload
-        );
-
-      } catch (error) {
-
-        console.error(
-          "INIT ERROR:",
-          error
-        );
-
-        showError(
-          error.message ||
-          "Có lỗi khi khởi tạo ứng dụng."
-        );
-
-      }
-
-    }
-
-
-    // =====================================================
-    // START
-    // =====================================================
-
-    init();
-
-  </script>
-
-</body>
+        // =====================================================
+        function updateCount() {
+          const dongCount = document.getElementById("dongCount");
+          const soanCount = document.getElementById("soanCount");
+          const giaoCount = document.getElementById("giaoCount");
+          if (dongCount) {
+            dongCount.textContent = `${selections.dong.size} người`;
+          }
+          if (soanCount) {
+            soanCount.textContent = `${selections.soan.size} người`;
+          }
+          if (giaoCount) {
+            giaoCount.textContent = `${selections.giao.size} người`;
+          }
+        }
+        // =====================================================
+        // QUANTITY
+        // =====================================================
+        function changeQuantity(delta) {
+          const input = document.getElementById("so_kien");
+          let value = Number(input.value) || 0;
+          value += delta;
+          if (value < 0) {
+            value = 0;
+          }
+          input.value = value;
+        }
+        // =====================================================
+        // GET SELECTED IDS
+        // =====================================================
+        function getSelectedIds(type) {
+          return Array.from(selections[type]).map(id => Number(id));
+        }
+        // =====================================================
+        // SUBMIT → TELEGRAM / N8N
+        // =====================================================
+        async function submitForm() {
+          clearError();
+          if (!orderPayload) {
+            showError("Không có dữ liệu đơn hàng.");
+            return;
+          }
+          // ===================================================
+          // TELEGRAM USER
+          // ===================================================
+          const user = telegramUser || {};
+          // ===================================================
+          // DATA
+          // ===================================================
+          const data = {
+            // ID đơn
+            id: orderPayload.id,
+            // Người đóng
+            d: getSelectedIds("dong"),
+            // Người soạn
+            s: getSelectedIds("soan"),
+            // Người giao
+            g: getSelectedIds("giao"),
+            // Số kiện
+            k: Number(document.getElementById("so_kien").value) || 0,
+            // Key
+            key: orderPayload.key || null,
+            // Telegram user
+            telegram_user_id: user.id || null,
+            telegram_first_name: user.first_name || null,
+            telegram_last_name: user.last_name || null,
+            telegram_username: user.username || null
+          };
+          console.log("SUBMIT DATA:", data);
+          // ===================================================
+          // VALIDATE
+          // ===================================================
+          if (!data.d.length) {
+            showError("Vui lòng chọn ít nhất một người đóng.");
+            return;
+          }
+          if (!data.s.length) {
+            showError("Vui lòng chọn ít nhất một người soạn.");
+            return;
+          }
+          if (!data.g.length) {
+            showError("Vui lòng chọn ít nhất một người giao.");
+            return;
+          }
+          // ===================================================
+          // BUTTON
+          // ===================================================
+          const button = document.getElementById("submitButton");
+          button.disabled = true;
+          button.textContent = "Đang lưu...";
+          // ===================================================
+          // WEBHOOK CHECK
+          // ===================================================
+          if (!orderPayload.webhook) {
+            button.disabled = false;
+            button.textContent = "CẬP NHẬT THÔNG TIN";
+            showError("Không tìm thấy webhook.");
+            return;
+          }
+          // ===================================================
+          // CALL N8N WEBHOOK
+          // ===================================================
+          try {
+            const response = await fetch(orderPayload.webhook, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(data)
+            });
+            // =================================================
+            // HTTP STATUS
+            // =================================================
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            // =================================================
+            // RESPONSE
+            // =================================================
+            let result = null;
+            try {
+              result = await response.json();
+            } catch (e) {
+              result = null;
+            }
+            console.log("N8N RESPONSE:", result);
+            // =================================================
+            // SUCCESS
+            // =================================================
+            button.textContent = "✓ Đã lưu";
+            // Telegram haptic
+            if (tg.HapticFeedback) {
+              tg.HapticFeedback.notificationOccurred("success");
+            }
+            // Close Mini App
+            setTimeout(() => {
+              if (tg.close) {
+                tg.close();
+              }
+            }, 500);
+          } catch (error) {
+            console.error("N8N WEBHOOK ERROR:", error);
+            button.disabled = false;
+            button.textContent = "CẬP NHẬT THÔNG TIN";
+            if (tg.HapticFeedback) {
+              tg.HapticFeedback.notificationOccurred("error");
+            }
+            showError("Không thể lưu đơn hàng: " + error.message);
+          }
+        }
+        // =====================================================
+        // INIT
+        // =====================================================
+        function init() {
+          try {
+            // ================================================
+            // GET PAYLOAD
+            // ================================================
+            orderPayload = getPayload();
+            if (!orderPayload) {
+              showError("Không có dữ liệu đơn hàng.");
+              return;
+            }
+            // ================================================
+            // ORDER ID
+            // ================================================
+            document.getElementById("orderId").textContent = orderPayload.id ?? "...";
+            // ================================================
+            // ORDER CODE
+            // ================================================
+            document.getElementById("orderCode").textContent = orderPayload.code ?? "...";
+            // ================================================
+            // PEOPLE
+            // ================================================
+            const people = Array.isArray(orderPayload.p) ? orderPayload.p : [];
+            // ================================================
+            // NGƯỜI ĐÓNG
+            // ================================================
+            createPeopleSelector("dongSelect", "dong", people, orderPayload.d);
+            // ================================================
+            // NGƯỜI SOẠN
+            // ================================================
+            createPeopleSelector("soanSelect", "soan", people, orderPayload.s);
+            // ================================================
+            // NGƯỜI GIAO
+            // ================================================
+            createPeopleSelector("giaoSelect", "giao", people, orderPayload.g);
+            // ================================================
+            // SỐ KIỆN
+            // ================================================
+            document.getElementById("so_kien").value = Number(orderPayload.k) || 0;
+            // ================================================
+            // COUNT
+            // ================================================
+            updateCount();
+            console.log("Mini App initialized:", orderPayload);
+          } catch (error) {
+            console.error("INIT ERROR:", error);
+            showError(error.message || "Có lỗi khi khởi tạo ứng dụng.");
+          }
+        }
+        // =====================================================
+        // START
+        // =====================================================
+        init();
+    </script>
+  </body>
 </html>
