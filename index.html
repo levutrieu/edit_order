@@ -276,6 +276,22 @@
 	  border-color: #2563eb;
 	}
 
+	/* =========================================
+	FIX: Tom Select remove_button padding-right
+	========================================= */
+	
+	/* Không để remove_button ép padding-right quá lớn */
+	.ts-wrapper.plugin-remove_button:not(.rtl) .item {
+	padding-right: 8px !important;
+	}
+	
+	/* Nút X vẫn có khoảng cách đẹp */
+	.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
+	padding: 0 !important;
+	margin-left: 6px !important;
+	border-left: 0 !important;
+	}
+
     /* =====================================================
        DROPDOWN
        ===================================================== */
